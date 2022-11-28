@@ -16,6 +16,7 @@
 #include <set>
 
 #include "kernel/alps.h"
+#include "kernel/population.h"
 
 namespace vita::selection
 {
@@ -87,7 +88,9 @@ public:
   typename strategy<T>::parents_t run();
 
 private:
-  typename population<T>::coord pickup(unsigned, double = 1.0) const;
+  [[nodiscard]] bool aged(const typename population<T>::coord &) const;
+  [[nodiscard]] typename population<T>::coord pickup(unsigned,
+                                                     double = 1.0) const;
 };
 
 ///

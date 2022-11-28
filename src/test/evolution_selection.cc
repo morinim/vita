@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -118,13 +118,19 @@ TEST_CASE_FIXTURE(fixture2, "ALPS")
           std::is_sorted(parents.begin(), parents.end(),
                          [&](const coord &c1, const coord &c2)
                          {
-                           std::pair<bool, fitness_t> v1;
-                           v1.first = !vita::alps::aged(pop, c1);
-                           v1.second = eva(pop[c1]);
+                           std::pair<bool, fitness_t> v1 =
+                           {
+                             !prob.env.alps.aged(pop[c1], c1.layer,
+                                                 pop.layers()),
+                             eva(pop[c1])
+                           };
 
-                           std::pair<bool, fitness_t> v2;
-                           v2.first = !vita::alps::aged(pop, c2);
-                           v2.second = eva(pop[c2]);
+                           std::pair<bool, fitness_t> v2 =
+                           {
+                             !prob.env.alps.aged(pop[c2], c2.layer,
+                                                 pop.layers()),
+                             eva(pop[c2])
+                           };
 
                            return v1 > v2;
                          }));

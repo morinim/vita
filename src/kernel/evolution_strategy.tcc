@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -103,9 +103,8 @@ void basic_alps_es<T, CS>::after_generation()
   // Code executed every `age_gap` interval.
   if (sum->gen && sum->gen % env.alps.age_gap == 0)
   {
-    if (layers < env.layers ||
-        sum->az.age_dist(layers - 1).mean() >
-        alps::max_age(layers, env.alps.age_gap))
+    if (layers < env.layers
+        || sum->az.age_dist(layers - 1).mean() > env.alps.max_age(layers))
       pop.add_layer();
     else
     {
@@ -146,7 +145,7 @@ void basic_alps_es<T, CS>::log_strategy(unsigned last_run,
     {
       f_lys << current_run << ' ' << this->sum_->gen << ' ' << l << " <";
 
-      const auto ma(alps::allowed_age(pop, l));
+      const auto ma(env.alps.allowed_age(l, layers));
       if (ma == std::numeric_limits<decltype(ma)>::max())
         f_lys << "inf";
       else

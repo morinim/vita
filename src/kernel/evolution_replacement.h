@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,11 +15,11 @@
 
 #include "kernel/alps.h"
 
-namespace vita {
-namespace replacement {
+namespace vita::replacement
+{
 ///
-/// \brief The replacement strategy (random, tournament...) for the
-///        vita::evolution_strategy class.
+/// The replacement strategy (random, tournament...) for the
+/// vita::evolution_strategy class.
 ///
 /// \tparam T type of program (individual/team).
 ///
@@ -44,7 +44,7 @@ protected:
 };
 
 ///
-/// \brief A family competition replacement scheme.
+/// A family competition replacement scheme.
 ///
 /// \tparam T type of program (individual/team).
 ///
@@ -53,9 +53,9 @@ protected:
 /// parents to be included in the population.
 ///
 /// A child replaces the worst parent if the former has a higher fitness
-/// (_deterministic crowding_ and _elitist recombination_); if elitism is
+/// (*deterministic crowding* and *elitist recombination*); if elitism is
 /// `false`, the winner of the parent-offspring tournament is chosen by
-/// using a probability proportional to the fitness (_probabistic crowding_).
+/// using a probability proportional to the fitness (*probabistic crowding*).
 ///
 /// \see
 /// "Replacement Strategies to Preserve Useful Diversity in Steady-State
@@ -72,9 +72,9 @@ public:
 };
 
 ///
-/// \brief Tournament based replacement scheme (aka kill tournament)
+/// Tournament based replacement scheme (aka kill tournament).
 ///
-/// \tparam T type of program (individual/team(
+/// \tparam T type of program (individual/team)
 ///
 /// This strategy select an individual for replacement by kill tournament:
 /// pick a number of individuals at random and replace the worst.
@@ -94,7 +94,7 @@ public:
 };
 
 ///
-/// \brief ALPS based replacement scheme
+/// ALPS based replacement scheme.
 ///
 /// \tparam T type of program (individual/team)
 ///
@@ -102,7 +102,7 @@ public:
 /// tournament.
 /// When an individual is too old for its current layer, it cannot be used
 /// to generate new individuals for that layer and eventually is removed
-/// from that layer. Optionally, an attempt can be made to move this
+/// from the layer. Optionally, an attempt can be made to move this
 /// individual up to the next layer -- in which case it replaces some
 /// individual there that it is better than.
 ///
@@ -122,7 +122,7 @@ public:
   void try_move_up_layer(unsigned);
 
 private:
-  unsigned allowed_age(unsigned) const;
+  [[nodiscard]] unsigned allowed_age(unsigned) const;
   bool try_add_to_layer(unsigned, const T &);
 };
 
@@ -138,7 +138,6 @@ public:
 
 #include "kernel/evolution_replacement.tcc"
 
-}  // namespace replacement
-}  // namespace vita
+}  // namespace vita::replacement
 
-#endif  // Include guard
+#endif  // include guard

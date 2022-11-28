@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -13,16 +13,30 @@
 #include <limits>
 
 #include "kernel/alps.h"
+#include "utility/contracts.h"
 
 namespace vita::alps
 {
 
 ///
-/// \param[in] l a layer.
-/// \param[in] age_gap see environment::age_gap data member.
-/// \return the maximum allowed age for an individual in layer `l`.
+/// \param[in] l      a specific layer
+/// \param[in] layers total number of layers the population is structured on
+/// \return           the maximum allowed age for an individual in layer `l`.
+///                   For individuals in the last layer there isn't a age limit
 ///
-unsigned max_age(unsigned l, unsigned age_gap)
+unsigned parameters::allowed_age(unsigned l, unsigned layers) const
+{
+  Expects(l < layers);
+
+  return l + 1 == layers ? std::numeric_limits<unsigned>::max()
+                         : max_age(l);
+}
+
+///
+/// \param[in] l a layer
+/// \return      the maximum allowed age for an individual in layer `l`
+///
+unsigned parameters::max_age(unsigned l) const
 {
   // A polynomial aging scheme.
   switch (l)

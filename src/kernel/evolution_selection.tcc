@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -108,6 +108,14 @@ typename population<T>::coord alps<T>::pickup(unsigned l, double p) const
   return {l, vita::random::sup(this->pop_.individuals(l))};
 }
 
+template<class T>
+bool alps<T>::aged(const typename population<T>::coord &c) const
+{
+  const auto &pop(this->pop_);
+
+  return pop.get_problem().env.alps.aged(pop[c], c.layer, pop.layers());
+}
+
 ///
 /// \return a vector of coordinates of chosen individuals
 ///
@@ -129,8 +137,8 @@ typename strategy<T>::parents_t alps<T>::run()
   // This type is used to take advantage of the lexicographic comparison
   // capabilities of std::pair.
   using age_fit_t = std::pair<bool, fitness_t>;
-  age_fit_t age_fit0{!vita::alps::aged(pop, c0), this->eva_(pop[c0])};
-  age_fit_t age_fit1{!vita::alps::aged(pop, c1), this->eva_(pop[c1])};
+  age_fit_t age_fit0{!aged(c0), this->eva_(pop[c0])};
+  age_fit_t age_fit1{!aged(c1), this->eva_(pop[c1])};
 
   if (age_fit0 < age_fit1)
   {
@@ -147,8 +155,7 @@ typename strategy<T>::parents_t alps<T>::run()
   while (rounds--)
   {
     const auto tmp(this->pickup(layer, same_layer_p));
-    const age_fit_t tmp_age_fit{!vita::alps::aged(pop, tmp),
-                                this->eva_(pop[tmp])};
+    const age_fit_t tmp_age_fit{!aged(tmp), this->eva_(pop[tmp])};
 
     if (age_fit0 < tmp_age_fit)
     {

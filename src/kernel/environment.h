@@ -19,6 +19,7 @@
 
 #include "tinyxml2/tinyxml2.h"
 
+#include "kernel/alps.h"
 #include "kernel/model_measurements.h"
 #include "kernel/log.h"
 #include "kernel/range.h"
@@ -264,38 +265,7 @@ public:
   /// By default only fitness is considered.
   model_measurements threshold = model_measurements();
 
-  ///
-  /// Parameters for the Age-Layered Population Structure (ALPS) paradigm.
-  ///
-  /// ALPS is a meta heuristic for overcoming premature convergence by
-  /// running multiple instances of a search algorithm in parallel, with each
-  /// instance in its own age layer and having its own population.
-  ///
-  struct alps_parameters
-  {
-    /// The maximum ages for age layers is monotonically increasing and
-    /// different methods can be used for setting these values. Since there
-    /// is generally little need to segregate individuals which are within a
-    /// few "generations" of each other, these values are then multiplied by
-    /// an `age_gap` parameter. In addition, this allows individuals in the
-    /// first age-layer some time to be optimized before them, or their
-    /// offspring, are pushed to the next age layer.
-    /// For instance, with 6 age layers, a linear aging-scheme and an age gap
-    /// of 20, the maximum ages for the layers are: 20, 40, 60, 80, 100, 120.
-    ///
-    /// Also, the `age_gap` parameter sets the frequency of how often the first
-    /// layer is restarted.
-    ///
-    /// \note A value of 0 means undefined (auto-tune).
-    unsigned age_gap = 20;
-
-    /// We already have a parent (individual) from a layer, which is the
-    /// probability that the second parent will be extracted from the same
-    /// layer? (with ALPS it could be taken from the previous layer).
-    ///
-    /// \note A negative value means undefined (auto-tune).
-    double p_same_layer = 0.75;
-  } alps;
+  alps::parameters alps;
 
   struct de_parameters
   {

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -142,18 +142,20 @@ void tournament<T>::run(
 
 ///
 /// \param[in] l a layer
-/// \return the maximum allowed age for an individual in layer `l`
+/// \return    the maximum allowed age for an individual in layer `l`
 ///
 /// This is just a convenience method to save some keystroke.
 ///
 template<class T>
 unsigned alps<T>::allowed_age(unsigned l) const
 {
-  return vita::alps::allowed_age(this->pop_, l);
+  const auto &pop(this->pop_);
+
+  return pop.get_problem().env.alps.allowed_age(l, pop.layers());
 }
 
 ///
-/// \param[in] l a layer.
+/// \param[in] l a layer
 ///
 /// Try to move individuals in layer `l` in the upper layer (calling
 /// try_add_to_layer for each individual).

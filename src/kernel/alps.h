@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2017, 2017, 2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -13,43 +13,58 @@
 #if !defined(VITA_ALPS_H)
 #define      VITA_ALPS_H
 
-#include "kernel/population.h"
-
 namespace vita::alps
 {
 
-unsigned max_age(unsigned, unsigned);
-
 ///
-/// \param[in] p the population.
-/// \param[in] l a layer of the population.
-/// \return the maximum allowed age for an individual in layer `l`. For
-///         individuals in the last layer there isn't a age limit.
+/// Parameters for the Age-Layered Population Structure (ALPS) paradigm.
 ///
-template<class T>
-unsigned allowed_age(const population<T> &pop, unsigned l)
+/// ALPS is a meta heuristic for overcoming premature convergence by
+/// running multiple instances of a search algorithm in parallel, with each
+/// instance in its own age layer and having its own population.
+///
+struct parameters
 {
-  const auto layers(pop.layers());
-  Expects(l < layers);
+  [[nodiscard]] unsigned allowed_age(unsigned, unsigned) const;
+  [[nodiscard]] unsigned max_age(unsigned) const;
 
-  if (l + 1 == layers)
-    return std::numeric_limits<unsigned>::max();
+  template<class T> [[nodiscard]] bool aged(const T &,
+                                            unsigned, unsigned) const;
 
-  return max_age(l, pop.get_problem().env.alps.age_gap);
-}
+  /// The maximum ages for age layers is monotonically increasing and
+  /// different methods can be used for setting these values. Since there
+  /// is generally little need to segregate individuals which are within a
+  /// few "generations" of each other, these values are then multiplied by
+  /// an `age_gap` parameter. In addition, this allows individuals in the
+  /// first age-layer some time to be optimized before them, or their
+  /// offspring, are pushed to the next age layer.
+  /// For instance, with 6 age layers, a linear aging-scheme and an age gap
+  /// of 20, the maximum ages for the layers are: 20, 40, 60, 80, 100, 120.
+  ///
+  /// Also, the `age_gap` parameter sets the frequency of how often the first
+  /// layer is restarted.
+  ///
+  /// \note A value of 0 means undefined (auto-tune).
+  unsigned age_gap = 20;
+
+  /// We already have a parent (individual) from a layer, which is the
+  /// probability that the second parent will be extracted from the same
+  /// layer? (with ALPS it could be taken from the previous layer).
+  ///
+  /// \note A negative value means undefined (auto-tune).
+  double p_same_layer = 0.75;
+};
 
 ///
-/// \param[in] p the population.
-/// \param[in] c the coordinates of an individual.
-/// \return `true` if the individual at coordinates `c` is too old for his
-///         layer.
+/// \param[in] p      a program
+/// \param[in] l      the layer where 'p' resides
+/// \param[in] layers total number of layers the population is structured on
+/// \return           `true` 'p' is too old for its layer
 ///
-/// This is just a convenience method to save some keystroke.
-///
-template<class T> bool aged(const population<T> &p,
-                            typename population<T>::coord c)
+template<class T> bool parameters::aged(const T &p,
+                                        unsigned l, unsigned layers) const
 {
-  return p[c].age() > allowed_age(p, c.layer);
+  return p.age() > allowed_age(l, layers);
 }
 
 }  // namespace vita::alps
