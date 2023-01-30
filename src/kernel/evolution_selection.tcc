@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2022 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -171,12 +171,12 @@ typename strategy<T>::parents_t alps<T>::run()
       age_fit1 = tmp_age_fit;
     }
 
-    assert(age_fit0.first == !vita::alps::aged(pop, c0));
-    assert(age_fit1.first == !vita::alps::aged(pop, c1));
+    assert(age_fit0.first == !aged(c0));
+    assert(age_fit1.first == !aged(c1));
     assert(age_fit0.second == this->eva_(pop[c0]));
     assert(age_fit1.second == this->eva_(pop[c1]));
     assert(age_fit0 >= age_fit1);
-    assert(!vita::alps::aged(pop, c0) || vita::alps::aged(pop, c1));
+    assert(!aged(c0) || aged(c1));
     assert(c0.layer <= layer);
     assert(layer <= c0.layer + 1);
     assert(c1.layer <= layer);
