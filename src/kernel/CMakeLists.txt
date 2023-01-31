@@ -1,7 +1,7 @@
 # Creates the "vita" library.
 
-file(GLOB_RECURSE KERNEL_SRC "*.cc")
-file(GLOB_RECURSE UTILITY_SRC "../utility/*.cc")
+file(GLOB_RECURSE KERNEL_SRC CONFIGURE_DEPENDS "*.cc")
+file(GLOB_RECURSE UTILITY_SRC CONFIGURE_DEPENDS "../utility/*.cc")
 
 set(FRAMEWORK_SRC ${KERNEL_SRC} ${UTILITY_SRC})
 

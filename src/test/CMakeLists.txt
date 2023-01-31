@@ -2,7 +2,7 @@
 
 enable_testing()
 
-file(GLOB TESTS_SRC *.cc)
+file(GLOB TESTS_SRC CONFIGURE_DEPENDS *.cc)
 foreach (test_src ${TESTS_SRC})
   get_filename_component(test ${test_src} NAME_WE)
   add_executable(${test} ${test_src})

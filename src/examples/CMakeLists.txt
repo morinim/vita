@@ -1,12 +1,13 @@
 # Creates the examples.
 
+add_subdirectory(gp_pathfinder)
 add_subdirectory(sr)
 
-file(GLOB FOREX_SRC "forex/*.cc")
+file(GLOB FOREX_SRC CONFIGURE_DEPENDS "forex/*.cc")
 add_executable(forex ${FOREX_SRC})
 target_link_libraries(forex vita)
 
-file(GLOB EXAMPLES_SRC *.cc)
+file(GLOB EXAMPLES_SRC CONFIGURE_DEPENDS *.cc)
 foreach (example_src ${EXAMPLES_SRC})
   # Gets the filename (`example`) without directory / longest extension
   # (`NAME_WE`) from the full filename (${example_src})

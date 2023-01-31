@@ -1,6 +1,6 @@
 # Creates the "sr" executable.
 
-file(GLOB_RECURSE SR_SRC "*.cc")
+file(GLOB_RECURSE SR_SRC CONFIGURE_DEPENDS "*.cc")
 
 add_executable(sr ${SR_SRC})
 
