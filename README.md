@@ -3,7 +3,6 @@
 
 ![C++17](https://img.shields.io/badge/c%2B%2B-17-blue.svg)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/morinim/vita?svg=true)][appveyor]
-[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/morinim/vita.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/morinim/vita/context:cpp)
 [![CII](https://bestpractices.coreinfrastructure.org/projects/1012/badge)][cii]
 [![License](https://img.shields.io/badge/license-MPLv2-blue.svg)][mpl2]
 [![Twitter](https://img.shields.io/twitter/url/https/github.com/morinim/vita.svg?style=social)][twitter]
