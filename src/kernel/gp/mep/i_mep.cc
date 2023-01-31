@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -503,8 +503,8 @@ bool i_mep::is_valid() const
 }
 
 ///
-/// \param[in] p  active symbol set
 /// \param[in] in input stream
+/// \param[in] ss active symbol set
 /// \return       `true` if the object has been loaded correctly
 ///
 /// \note

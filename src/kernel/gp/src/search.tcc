@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2022 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -102,8 +102,8 @@ bool src_search<T, ES>::can_validate() const
 ///
 /// Calculates various performance metrics.
 ///
-/// \param[in] s summary of the evolution run just finished
-/// \return      metrics regarding `s.best.solution`
+/// \param[out] s update summary of the evolution run just finished
+///               (metrics regarding `s.best.solution`)
 ///
 /// Accuracy calculation is performed if AT LEAST ONE of the following
 /// conditions is satisfied:
@@ -246,8 +246,8 @@ void src_search<T, ES>::print_resume(const model_measurements &m) const
 ///
 /// Writes end-of-run logs (run summary, results for test...).
 ///
-/// \param[in]  run_sum summary information regarding the search
-/// \param[out] d               output xml document
+/// \param[in]  s summary information regarding the search
+/// \param[out] d output xml document
 ///
 template<class T, template<class> class ES>
 void src_search<T, ES>::log_stats(const search_stats<T> &s,

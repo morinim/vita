@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -29,8 +29,6 @@ namespace vita
 
 ///
 /// The basic interface of a lambda function.
-///
-/// \tparam T type of individual
 ///
 /// A lambda function is used to calculate the answers for our problem. It's
 /// the model we've computed.
@@ -185,7 +183,6 @@ class core_class_lambda_f : public basic_src_lambda_f {};
 ///
 /// The basic interface of a classification lambda class.
 ///
-/// \tparam T type of individual
 /// \tparam N stores the name of the classes vs doesn't store the names
 ///
 /// This class:

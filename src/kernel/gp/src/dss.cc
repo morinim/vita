@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2022 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -98,8 +98,6 @@ void dss::move_to_validation()
 ///
 /// Available examples are randomly partitioned into two independent sets
 /// according to a given percentage.
-///
-/// \param[in] run current run
 ///
 /// \attention The procedure changes the current training / validation sets.
 ///

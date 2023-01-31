@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -29,16 +29,12 @@ public:
 
   /// Initializes the data structures needed for the validation strategy.
   ///
-  /// \param[in] run current run
-  ///
   /// \note Called at the beginning of the evolution (one time per run).
   virtual void init(unsigned /* run */) = 0;
 
   /// Changes the training environment.
   ///
-  /// \param[in] generation current generation
-  /// \return               `true` if some change in the training environment
-  ///                       has occured
+  /// \return               `true` if the training environment has changed
   ///
   /// By default does nothing, signalling that nothing is changed.
   ///
@@ -48,8 +44,6 @@ public:
   virtual bool shake(unsigned /* generation */)  { return false; }
 
   /// De-initializes the data structures needed for the validation strategy.
-  ///
-  /// \param[in] run current run
   ///
   /// \note Called at the end of the evolution (one time per run).
   virtual void close(unsigned /* run */) {}

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -425,7 +425,7 @@ std::size_t src_problem::setup_symbols_impl(const std::filesystem::path &file)
 ///
 /// \param[in] instance   a vector of categories
 /// \param[in] pattern    a mixed vector of category names and domain names
-/// \param[in] categories
+/// \param[in] categories information about input columns
 /// \return               `true` if `instance` match `pattern`
 ///
 /// For instance:

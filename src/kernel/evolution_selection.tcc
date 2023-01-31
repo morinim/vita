@@ -222,9 +222,9 @@ typename strategy<T>::parents_t pareto<T>::run()
 }
 
 ///
-/// \param[in] pool indexes of individuals in the population.
-/// \param[out] front the set of nondominated individuals of `pool`.
-/// \param[out] dominated the set of dominated individuals of `pool.
+/// \param[in]  pool indexes of individuals in the population
+/// \param[out] fs   the set of nondominated individuals of `pool` (front set)
+/// \param[out] ds   the set of dominated individuals of `pool (dominated set)
 ///
 template<class T>
 void pareto<T>::front(const std::vector<unsigned> &pool,

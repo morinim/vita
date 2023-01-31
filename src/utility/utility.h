@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -256,7 +256,7 @@ void set_text(tinyxml2::XMLElement *, const std::string &,
 ///
 /// \param[out] p parent element
 /// \param[in]  e new xml element
-/// \param[in]  s new xml element's value
+/// \param[in]  v new xml element's value
 ///
 template<class T>
 void set_text(tinyxml2::XMLElement *p, const std::string &e, const T &v)

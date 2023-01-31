@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -565,9 +565,9 @@ public:
   }
 
   ///
-  /// \param[in] i pointer to the active interpreter
-  /// \return      the natural logarithm of its argument or an empty value in
-  ///              case of invalid argument / infinite result
+  /// \param[in] args input parameters (lazy eval)
+  /// \return         the natural logarithm of its argument or an empty value
+  ///                 in case of invalid argument / infinite result
   ///
   value_t eval(symbol_params &args) const final
   {

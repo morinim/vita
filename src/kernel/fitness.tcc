@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,7 +20,7 @@
 ///
 /// Fills the fitness with `n` copies of value `v`.
 ///
-/// \param[in] n number of components of the fitness
+/// \param[in] s dimension of the the fitness vector
 /// \param[in] v default value
 ///
 /// Both Herb Sutter and Scott Meyers recommend to avoid class designs where

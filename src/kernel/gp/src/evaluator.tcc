@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -237,7 +237,7 @@ double count_error_functor<T>::operator()(
 }
 
 ///
-/// \param[in] p      current dataset
+/// \param[in] d      current dataset
 /// \param[in] x_slot basic parameter for the Slotted Dynamic Class Boundary
 ///                   Determination algorithm
 ///

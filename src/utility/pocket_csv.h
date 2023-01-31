@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of POCKET_CSV.
  *
- *  \copyright Copyright (C) 2016, 2022 Manlio Morini.
+ *  \copyright Copyright (C) 2016-2023 Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -631,7 +631,7 @@ inline parser::const_iterator parser::end() const
 }
 
 ///
-/// \return the next record of the CSV file
+/// Reads into the internal buffer the next record of the CSV file
 ///
 inline void parser::const_iterator::get_input()
 {

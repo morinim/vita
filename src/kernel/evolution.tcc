@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -236,7 +236,7 @@ void evolution<T, ES>::log_evolution(unsigned run_count) const
 ///
 /// \param[in] k             current generation
 /// \param[in] run_count     total number of runs planned
-/// \param[in] status        if `true` prints a summary line
+/// \param[in] summary       if `true` prints a summary line
 /// \param[in] from_last_msg time elapsed from the last message
 ///
 template<class T, template<class> class ES>

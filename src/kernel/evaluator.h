@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2021 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -72,10 +72,9 @@ enum class test_evaluator_type {distinct, fixed, random};
 ///
 /// A fitness function used for debug purpose.
 ///
-/// \tparam T  the type of individual used
-/// \tparam ET the type of the test evaluator
+/// \tparam T the type of individual used
 ///
-/// Depending on `ET` the evaluator returns:
+/// It can be:
 /// - a unique fitness (`test_evaluator_type::distinct`). Every individual has
 ///   his own (time invariant) fitness;
 /// - a random (time invariant) fitness (`test_evaluator_type::random`);

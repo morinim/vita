@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2021 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -347,8 +347,8 @@ search<T, ES> &search<T, ES>::validation_evaluator(Args && ...args)
 ///
 /// Sets the active validation strategy.
 ///
-/// \param[in] v a new validation strategy
-/// \return      a reference to the search class (used for method chaining)
+/// \param[in] args parameters for the validation strategy
+/// \return         a reference to the search class (used for method chaining)
 ///
 template<class T, template<class> class ES>
 template<class V, class... Args>

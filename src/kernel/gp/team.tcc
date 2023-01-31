@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -300,8 +300,7 @@ void team<T>::inc_age()
 }
 
 ///
-/// \param[in] verbose if `true` prints error messages to `std::cerr`
-/// \return            `true` if the team passes the internal consistency check
+/// \return `true` if the team passes the internal consistency check
 ///
 template<class T>
 bool team<T>::is_valid() const

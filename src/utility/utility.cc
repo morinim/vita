@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2022 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -17,10 +17,10 @@
 namespace vita
 {
 ///
-/// \param[in] s1 first term of comparison
-/// \param[in] s2 second term of comparison
-/// \return       `true` if all elements in both strings are same (case
-///               insensitively)
+/// \param[in] lhs first term of comparison
+/// \param[in] rhs second term of comparison
+/// \return        `true` if all elements in both strings are same (case
+///                insensitively)
 ///
 bool iequals(const std::string &lhs, const std::string &rhs)
 {

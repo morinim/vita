@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2021 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -42,7 +42,7 @@ fitness_t evaluator<T>::fast(const T &i)
 /// If the load operation isn't successful the current object isn't changed.
 ///
 template<class T>
-bool evaluator<T>::load(std::istream &)
+bool evaluator<T>::load([[maybe_unused]] std::istream &in)
 {
   return true;
 }
@@ -52,7 +52,7 @@ bool evaluator<T>::load(std::istream &)
 /// \return         `true` if the object was saved correctly
 ///
 template<class T>
-bool evaluator<T>::save(std::ostream &) const
+bool evaluator<T>::save([[maybe_unused]] std::ostream &out) const
 {
   return true;
 }

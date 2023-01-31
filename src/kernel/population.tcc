@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,9 +20,7 @@
 ///
 /// Creates a random population.
 ///
-/// \param[in] e current problem
-///
-/// Starting size of the population is `e.individuals`.
+/// \param[in] p current problem
 ///
 template<class T>
 population<T>::population(const problem &p) : prob_(&p), pop_(1),
