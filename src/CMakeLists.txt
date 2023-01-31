@@ -1,12 +1,28 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.20)
 
 project(VITA)
+
+#include(CheckIPOSupported)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if (NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
+
+#if (CMAKE_BUILD_TYPE MATCHES "Release")
+#check_ipo_supported(RESULT supported_ipo OUTPUT error_ipo)
+#
+#if (supported_ipo)
+#  message(STATUS "IPO / LTO supported: <${supported_ipo}>")
+#  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+#else ()
+#  message(STATUS "IPO / LTO not supported: <${error_ipo}>")
+#endif()
+#endif()
+
+#message("CMAKE_CXX_FLAGS_DEBUG is ${CMAKE_CXX_FLAGS_DEBUG}")
+#message("CMAKE_CXX_FLAGS_RELEASE is ${CMAKE_CXX_FLAGS_RELEASE}")
 
 # The general idea is to use the default values and overwrite them only for
 # specific, well experimented environments.
@@ -15,22 +31,9 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU"
 
   set(NO_WARN_FLAGS "-w")
 
-  set(WARN_FLAGS "-Wpedantic" "-Wall" "-Wextra" "-Winvalid-pch" "-Wpedantic"
-                 "-Wformat=2" "-Wfloat-equal" "-Wshadow" "-Wdouble-promotion"
-                 "-Wzero-as-null-pointer-constant")
-  # `-Wconversion`, `-Wsign-conversion`, `-Weffc++` are other interesting
-  # switches to try from time to time (they give many false positives).
-
-  set(OTHER_FLAGS "-pipe" "-march=native")
-
-  set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -DBOOST_DISABLE_ASSERTS")
-
-  set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-s")
-
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 
   set(NO_WARN_FLAGS "/w")
-  set(WARN_FLAGS "/W3")
 
 endif()
 

@@ -1,0 +1,62 @@
+{
+	"version": 3,
+	"configurePresets":
+	[
+		{
+			"name": "base",
+			"hidden": true,
+			"generator": "Ninja",
+			"binaryDir": "${sourceParentDir}/build/",
+			"cacheVariables":
+			{
+				"CMAKE_EXE_LINKER_FLAGS_RELEASE": "-s",
+				"OTHER_FLAGS": "-pipe;-march=native",
+				"WARN_FLAGS": "-Wall;-Wextra;-Winvalid-pch;-Wpedantic;-Wformat=2;-Wfloat-equal;-Wshadow;-Wdouble-promotion;-Wzero-as-null-pointer-constant;$env{SPECIFIC_WARN_FLAGS}"
+			},
+			"warnings":
+			{
+				"dev": true
+			}
+		},
+		{
+			"name": "gcc",
+			"inherits": "base",
+			"environment":
+			{
+				"CXX": "g++"
+			}
+		},
+		{
+			"name": "gcc_debug",
+			"inherits": "gcc",
+			"cacheVariables":
+			{
+				"CMAKE_BUILD_TYPE": "Debug"
+			}
+		},
+		{
+			"name": "clang",
+			"inherits": "base",
+			"environment":
+			{
+				"CXX": "clang++",
+				"SPECIFIC_WARN_FLAGS": "-Wdocumentation"
+			}
+		},
+		{
+			"name": "clang_debug",
+			"inherits": "clang",
+			"cacheVariables":
+			{
+				"CMAKE_BUILD_TYPE": "Debug"
+			}
+		},
+		{
+			"name": "msvc",
+			"cacheVariables":
+			{
+				"WARN_FLAGS": "/W3"
+			}
+		}
+	]
+}
