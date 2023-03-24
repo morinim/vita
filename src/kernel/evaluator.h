@@ -82,7 +82,7 @@ enum class test_evaluator_type {distinct, fixed, random};
 ///   entire population.
 ///
 template<class T>
-class test_evaluator : public vita::evaluator<T>
+class test_evaluator final : public vita::evaluator<T>
 {
 public:
   explicit test_evaluator(test_evaluator_type = test_evaluator_type::random);

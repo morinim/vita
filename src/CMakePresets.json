@@ -11,7 +11,7 @@
 			{
 				"CMAKE_EXE_LINKER_FLAGS_RELEASE": "-s",
 				"OTHER_FLAGS": "-pipe;-march=native",
-				"WARN_FLAGS": "-Wall;-Wextra;-Winvalid-pch;-Wpedantic;-Wformat=2;-Wfloat-equal;-Wshadow;-Wdouble-promotion;-Wzero-as-null-pointer-constant;$env{SPECIFIC_WARN_FLAGS}"
+				"WARN_FLAGS": "-Wall;-Wextra;-Winvalid-pch;-Wpedantic;-Wformat=2;-Wfloat-equal;-Wshadow;-Wdouble-promotion;-Wzero-as-null-pointer-constant;-Wmissing-include-dirs;-Wundef;-Winvalid-pch;-Wdouble-promotion;-Wfloat-equal;-Wcast-qual;-Wcast-align;-Wpacked;-Wredundant-decls;-Wmissing-field-initializers;-Wdisabled-optimization;-Wctor-dtor-privacy;-Woverloaded-virtual;-Wsuggest-override;-Wnull-dereference;-Wextra-semi;$env{SPECIFIC_WARN_FLAGS}"
 			},
 			"warnings":
 			{
@@ -23,7 +23,8 @@
 			"inherits": "base",
 			"environment":
 			{
-				"CXX": "g++"
+				"CXX": "g++",
+				"SPECIFIC_WARN_FLAGS": "-Wlogical-op;-Wduplicated-cond;-Wduplicated-branches;-Wstringop-truncation"
 			}
 		},
 		{
@@ -40,7 +41,7 @@
 			"environment":
 			{
 				"CXX": "clang++",
-				"SPECIFIC_WARN_FLAGS": "-Wdocumentation"
+				"SPECIFIC_WARN_FLAGS": "-Wdocumentation;-Warc-repeated-use-of-weak;-Wbitfield-enum-conversion;-Wclass-varargs;-Wconditional-uninitialized;-Wthread-safety;-Wconsumed;-Wdirect-ivar-access;-Wexpansion-to-defined;-Winconsistent-missing-destructor-override;-Winfinite-recursion;-Wloop-analysis;-Wmethod-signatures;-Wmismatched-tags;-Wnonportable-system-include-path;-Wnull-pointer-arithmetic;-Wover-aligned;-Woverriding-method-mismatch;-Wpch-date-time;-Wpragmas;-Wreserved-user-defined-literal;-Wretained-language-linkage;-Wsemicolon-before-method-body;-Wsometimes-uninitialized;-Wstring-conversion;-Wsuper-class-method-mismatch;-Wtautological-compare;-Wundefined-reinterpret-cast;-Wunreachable-code;-Wcomma;-Wduplicate-method-arg;-Wduplicate-method-match;-Wdynamic-exception-spec;-Wempty-translation-unit;-Wexplicit-ownership-type;-Wignored-qualifiers;-Wredundant-parens;-Wstatic-in-inline;-Wzero-length-array;-Wunneeded-internal-declaration"
 			}
 		},
 		{

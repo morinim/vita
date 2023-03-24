@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2022 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -90,7 +90,7 @@ private:
 /// floating-point numbers without ever being reformatted as genes with a
 /// different binary representation.
 ///
-class real : public detail::number<double>
+class real final : public detail::number<double>
 {
 public:
   // \param[in] r a half open range
@@ -102,7 +102,7 @@ public:
   }
 };
 
-class integer : public detail::number<int>
+class integer final : public detail::number<int>
 {
 public:
   // \param[in] r a half open range

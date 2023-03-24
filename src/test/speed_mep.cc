@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2021 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2021-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -158,7 +158,7 @@ std::uint64_t speed_random_locus()
       for (auto iter(left.cbegin()); iter != left.end();)
       {
         for (std::size_t s(std::floor(std::log(random::sup(1.0))
-                                      / std::log(1.0-W)) + 1);
+                                      / std::log(1.0-W)) + 1.0);
              s && iter != left.end();
              --s)
         {

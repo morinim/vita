@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2022 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,7 +20,7 @@
 
 struct fixture4
 {
-  class Z : public vita::terminal
+  class Z final : public vita::terminal
   {
   public:
     Z() : vita::terminal("Z", 0) {}

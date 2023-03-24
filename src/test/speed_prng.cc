@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2018-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,7 +18,7 @@
 
 int main()
 {
-  volatile std::uint64_t out;
+  volatile std::uint64_t out(0);
   unsigned sup(-1);
 
   // -------------------------------------------------------------------------
