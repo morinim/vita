@@ -34,7 +34,7 @@ public:
 
   /// Changes the training environment.
   ///
-  /// \return               `true` if the training environment has changed
+  /// \return `true` if the training environment has changed
   ///
   /// By default does nothing, signalling that nothing is changed.
   ///

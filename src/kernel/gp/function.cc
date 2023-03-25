@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -24,6 +24,20 @@ namespace vita
 ///
 function::function(const std::string &dis, category_t c, cvect args)
   : symbol(dis, c), argt_(std::move(args))
+{
+  Ensures(is_valid());
+}
+
+///
+/// \param[in] dis    string representation of the function (e.g. for the plus
+///                   function it could by "ADD" or "+")
+/// \param[in] n_args number of arguments of the function
+///
+/// Assumes category `0` for the function and its arguments. This constructor
+/// is usually chosen when types are not used.
+///
+function::function(const std::string &dis, std::size_t n_args)
+  : function(dis, 0, cvect(n_args, 0))
 {
   Ensures(is_valid());
 }

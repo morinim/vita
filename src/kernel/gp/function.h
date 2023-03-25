@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -35,6 +35,7 @@ class function : public symbol
 {
 public:
   function(const std::string &, category_t, cvect);
+  function(const std::string &, std::size_t);
 
   [[nodiscard]] category_t arg_category(std::size_t) const;
 

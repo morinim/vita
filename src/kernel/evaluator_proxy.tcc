@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2021 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -81,6 +81,9 @@ fitness_t evaluator_proxy<T, E>::operator()(const T &prg)
 ///
 /// \param[in] prg the program (individual/team) whose fitness we want to know
 /// \return        an approximation of the fitness of `prg`
+///
+/// \remark
+/// The approximated ("fast") fitness isn't stored in the cache.
 ///
 template<class T, class E>
 fitness_t evaluator_proxy<T, E>::fast(const T &prg)
