@@ -6,11 +6,10 @@ if (${SDL2_FOUND})
   include_directories(${SDL2_INCLUDE_DIRS})
 
   file(GLOB_RECURSE GP_PATHFINDER_SRC CONFIGURE_DEPENDS "*.cc")
-  file(GLOB_RECURSE IMGUI_SRC CONFIGURE_DEPENDS "../../third_party/imgui/*.cpp")
 
-  add_executable(gp_pathfinder ${GP_PATHFINDER_SRC} ${IMGUI_SR})
+  add_executable(gp_pathfinder ${GP_PATHFINDER_SRC})
 
-  target_link_libraries(gp_pathfinder vita ${SDL2_LIBRARIES})
+  target_link_libraries(gp_pathfinder vita imgui ${SDL2_LIBRARIES})
 
   # Resources needed by examples
   file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/map.txt

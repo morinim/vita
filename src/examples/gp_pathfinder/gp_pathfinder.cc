@@ -15,6 +15,9 @@
 #include <iostream>
 #include <vector>
 
+#include "third_party/imgui/imgui.h"
+#include "third_party/imgui/imgui_impl_sdl2.h"
+#include "third_party/imgui/imgui_impl_sdlrenderer.h"
 #include <SDL2/SDL.h>
 
 #include "kernel/vita.h"
@@ -562,14 +565,19 @@ class framework
 public:
   framework(unsigned width, unsigned height)
   {
-    SDL_Init(SDL_INIT_VIDEO);
-    SDL_CreateWindowAndRenderer(width, height, 0, &win, &renderer);
+    const auto flags(static_cast<SDL_WindowFlags>(
+                       SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI));
+
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
+    SDL_CreateWindowAndRenderer(width, height, flags, &win, &renderer);
     SDL_RenderClear(renderer);
     SDL_RenderPresent(renderer);
   }
 
   operator SDL_Renderer *() { return renderer; }
   operator bool() const { return win && renderer; }
+
+  SDL_Window *window() { return win; }
 
   int height() const
   {
@@ -595,6 +603,56 @@ public:
 private:
   SDL_Window *win {nullptr};
   SDL_Renderer *renderer {nullptr};
+};
+
+class imgui_framework : public framework
+{
+public:
+  imgui_framework(unsigned width, unsigned height)
+    : framework(width, height)
+  {
+#if !SDL_VERSION_ATLEAST(2,0,17)
+#  error This backend requires SDL 2.0.17+
+#endif
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+
+    ImGui_ImplSDL2_InitForSDLRenderer(window(), *this);
+    ImGui_ImplSDLRenderer_Init(*this);
+
+    ImGuiIO &io(ImGui::GetIO());
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+    ImGui::StyleColorsDark();
+  }
+
+  void render()
+  {
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+    ImGui::Render();
+
+    ImGuiIO &io(ImGui::GetIO());
+    SDL_RenderSetScale(*this,
+                       io.DisplayFramebufferScale.x,
+                       io.DisplayFramebufferScale.y);
+    SDL_SetRenderDrawColor(*this,
+                           (Uint8)(clear_color.x * 255),
+                           (Uint8)(clear_color.y * 255),
+                           (Uint8)(clear_color.z * 255),
+                           (Uint8)(clear_color.w * 255));
+    SDL_RenderClear(*this);
+    ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+    SDL_RenderPresent(*this);
+  }
+
+  ~imgui_framework()
+  {
+    ImGui_ImplSDLRenderer_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
+  }
 };
 
 void draw_goal(framework &fw, const simulation &s)
@@ -640,7 +698,6 @@ void draw_trajectory(
 
     const SDL_Point start_p{cell_w / 2 + cell_w * p0.x,
                             cell_h / 2 + cell_h * p0.y};
-
 
     SDL_Point end_p(start_p);
 
@@ -732,7 +789,7 @@ void draw_agent(framework &fw, const simulation &s, position p, direction d)
   SDL_Delay(3);
 }
 
-bool render_simulation(const vita::i_mep *prg = nullptr)
+bool render_simulation(const vita::i_mep *prg)
 {
   const int map_h(active_sim->map().height());
   const int map_w(active_sim->map().width());
@@ -741,7 +798,7 @@ bool render_simulation(const vita::i_mep *prg = nullptr)
 
   const int h(map_h * cell_size), w(map_w * cell_size);
 
-  static framework fw(w, h);
+  static framework fw_map(w, h);
 
   for (int y(0); y < map_h; ++y)
     for (int x(0); x < map_w; ++x)
@@ -751,41 +808,48 @@ bool render_simulation(const vita::i_mep *prg = nullptr)
 
       SDL_Color c(t_color(active_sim->terrain_at(position(y, x))));
 
-      SDL_SetRenderDrawColor(fw, c.r, c.g, c.b, c.a);
-      SDL_RenderFillRect(fw, &r);
+      SDL_SetRenderDrawColor(fw_map, c.r, c.g, c.b, c.a);
+      SDL_RenderFillRect(fw_map, &r);
 
       if (active_sim->terrain_at(position(y, x)) == enemy)
       {
         r = {r.x + r.w /4, r.y + r.h / 4,
              r.w / 2, r.h / 2};
-        SDL_SetRenderDrawColor(fw, 0, 0, 0, 255);
-        SDL_RenderFillRect(fw, &r);
+        SDL_SetRenderDrawColor(fw_map, 0, 0, 0, 255);
+        SDL_RenderFillRect(fw_map, &r);
       }
     }
 
-  draw_goal(fw, *active_sim);
+  draw_goal(fw_map, *active_sim);
 
   //for (const auto &[p, d] : active_sim->agent().trajectory())
-  //  draw_agent(fw, *active_sim, p, d);
+  //  draw_agent(fw_map, *active_sim, p, d);
 
-  draw_trajectory(fw, *active_sim, active_sim->agent().trajectory());
+  draw_trajectory(fw_map, *active_sim, active_sim->agent().trajectory());
 
-  //static Mat program_image;
-  //if (prg)
-  //{
-  //  program_image = Mat::zeros(w, h, CV_8UC3);
-  //  std::ostringstream out;
-  //  out << vita::out::c_language << *prg;
+  SDL_RenderPresent(fw_map);
 
-  //  cv::putText(program_image, out.str(),
-  //              Point(0, 30),
-  //              cv::FONT_HERSHEY_SIMPLEX,
-  //              1,
-  //              Scalar(0, 255, 0),
-  //              1);
-  //}
+  static imgui_framework fw_info(w, h);
 
-  SDL_RenderPresent(fw);
+  ImGui_ImplSDLRenderer_NewFrame();
+  ImGui_ImplSDL2_NewFrame();
+  ImGui::NewFrame();
+
+  ImGui::ShowDemoWindow();
+
+  if (prg)
+  {
+    std::ostringstream out;
+    out << vita::out::c_language << *prg;
+
+    ImGui::Begin("Best program so far");
+    ImGui::BeginChild("Scrolling");
+    ImGui::Text("%s", out.str().c_str());
+    ImGui::EndChild();
+    ImGui::End();
+  }
+
+  fw_info.render();
 
   SDL_Event event;
   SDL_PollEvent(&event);
