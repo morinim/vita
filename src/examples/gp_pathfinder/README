@@ -1,0 +1,329 @@
+Evolving Better Pathfinders
+
+March 1, 2008
+
+Algorithms like A* are well known solutions to the pathfinding problem, but there is a distinction between efficient and accurate pathfinding algorithms, and realistic pathfinding algorithms. The traditional definition of a “good” algorithm requires it be complete and quick. My definition of “realistic”, in contrast, is that an algorithm be reasonably good, reasonably fast, and reasonably fallable. That is, it should not be perfect, and when it does fail, it should fail in much the same way a human fails.
+
+The following article is a supplement to an article I wrote for GamaSutra, and is intended as a more in depth explanation of how the Hampton pathfinding application used Genetic Programming to evolve a more realistic pathfinder. You may want to read the original article before continuing on.
+
+Preliminaries
+
+The Hamton project is now available at SourceForge. http://sourceforge.net/projects/hampton
+
+A recent build is also at the end of this document.
+
+You can contact Rick using the contact form. For discussion about this project, use this wiki entry’s discussion page. For discussion about the Hampton project (for contributors), use the Hampton Discussion page.
+
+Using Genetic Programming to Evolve a Better Pathfinding Algorithm
+
+Hampton attempts to evolve a path finding algorithm with which a unit can intelligently but realisticly move from one point on a map to another, given a set of obstacles and impediments.
+
+I also am planning to implement the A* path finding algorithm in this application for easy comparison of the existing program and the evolved program. I will be using the STL A* implementation written by Justin Heyes-Jones, modified slightly (see below).
+
+It is important to note that we are not evolving the path (which would be a GA problem) from start to finish, but the algorithm which finds the path. In other words, the evolved solution is the program which solves the problem. Consequently, a good solution should find an efficient path regardless of the map it is run on.
+
+The Rules of the Game
+
+Maps
+
+Maps are based on a 40×40 grid of valid characters stored in a text file.
+
+A few sample maps after loading and displaying graphically:
+05-1234108591T.jpg 	05-1234174024T.jpg
+A mountain pass. Darker greys indicate steeper areas on the map, and are more costly to cross. 	A river and enemy cluster. Crossing water has around half the penalty of passing through enemy territory.
+
+Map Symbols
+
+The intelligence will need to find a path along a 40×40 map, where each 1×1 square is marked by one of a set of symbols:
+
+    X: Unpassable (a tree)
+    0-9: Sloped (with 0 being flat, 9 being totally uphill)
+    ~: Water
+    V: Enemy
+
+Moving to any square adds 1 to the total distance of the path. While squares marked X can not be moved to, all other squares can, with an associated cost. Stepping on a square gives a penalty to the unit except when the path is marked 0 (flat). Water gives a penalty of 5, while enemy squares give a penalty of 9 (the algorithm I’m seeking will control units without human interference, and as such enemy avoidance will be important).
+
+Because the unit is unaware of the map as a whole, I will still say that the best path is the shortest, as it will be the best path possible given the knowledge available. This is based on the assumption that an intelligent agent will attempt to reach his destination in the shortest time possible given the information he has available.
+
+Map Cycling
+
+While the application allows you to run the process on user defined maps, a truly good program should be successful on any map. To that end, the program can generate random maps, and regenerate the map automatically every x generations. Any well adapted algorithm will need to adapt further upon map cycling. Hopefully, after several map changes, the surviving algorithm should be able to handle any map thrown at it.
+
+When choosing a lifespan for the maps, we need to choose a duration that is long enough to allow the program to receive some feedback about the success of its technique, but not so much time that the program adapts specifically to the map. In other words, too short a map cycle and the program can’t evaluate itself. Too long a cycle and we end up with a great program for that individual map and that map only.
+
+The Existing A* Algorithm
+
+The A* path finding algorithm is the most widely known algorithm, and as such I am assuming it is the one most commonly used in games. I hope to evolve an equal or better algorithm (in terms of realism, not speed or efficiency) than A*.
+
+The following screens are taken from my modified version of Justin Heyes-Jones’ A* implementation.
+
+After my modification to the A* template, A* can operate in two modes: smart and stupid. Stupid A* only recognizes two states, passable or unpassable. Consequently the path is short, but not neccessarily efficient given the cost of the squares travelled upon. Smart A* considers those costs, and therefore finds the cheapest route, though not necessarily the shortest.
+
+Below are a few examples of why neither are perfect. The red line is the path discovered by one implementation of A*. Green squares are unpassable. Blue is water, red is enemy territory, and darker greys represent steeper slopes.
+05-2139397365T.jpg 	05-2153387457T.jpg 	05-2153408038T.jpg 	05-2204296038T.jpg
+A* effectively finds a path through this maze. This demonstrates A*’s effectiveness at finding a path in a complex situation. 	But without considering a move’s cost, stupid A* plows through any square it can, leading to a shorter, but more expensive path. 	Smart A*, able to consider the cost of each move, finds a less expensive path. It avoids the steep areas if it has a choice between steep terrain and flat land. 	But this condition is far too common. A*’s short-sighted decision making leads it away from water, right into a hornet’s nest.
+
+You can see the inherent problems with this algorithm. When it operates efficiently, it operates wholly unrealistically. When it operates “intelligently,” it runs the risk of making utterly horrendous decisions that no human intelligence would make (like opting for enemy contact rather than crossing the river).
+
+How It Works
+
+For a good explanation of how the A* algorithm works, see A* Pathfinding for Beginners by Patrick Lester.
+
+Limitations
+
+Bryan Stout, former AI programmer at MicroProse, sums up the limitations of A*:
+
+There are situations where A* may not perform very well, for a variety of reasons. The more or less real-time
+
+requirements of games, plus the limitations of the available memory and processor time in some of them, may make
+
+it hard even for A* to work well. A large map may require thousands of entries in the Open and Closed list, and
+
+there may not be room enough for that. Even if there is enough memory for them, the algorithms used for manipulating
+
+them may be inefficient.The quality of A*’s search depends on the quality of the heuristic estimate h(n). If h is very close to the true
+
+cost of the remaining path, its efficiency will be high; on the other hand, if it is too low, its efficiency gets
+
+very bad. In fact, breadth-first search is an A* search, with h being trivially zero for all nodesthis certainly
+
+underestimates the remaining path cost, and while it will find the optimum path, it will do so slowly.
+
+The full article is available at Gamasutra (registration required)
+
+Defining the Language
+
+A primary difficulty in using genetic programming to evolve an algorithm is in defining the language of the algorithm. One must select a set of functions and terminals which fully but minimally equip the program to solve the problem satisfactorily. A terminal is a leaf node of the program tree — no more logic branching will occur at this point. A function, on the other hand, is a fork in the road. We evaluate it, and based on its value decide which path to take down the tree.
+
+In the case of pathfinding, the term terminal refers to the moves, and it is the easiest set to define. Minimally we would like the agent to be able to moveForward, turnRight and turnLeft. By “turn” we mean rotate without moving. We could instead define the set of terminals to be moveForward, moveLeft and moveRight (wherein the agent physically moves to the right or left), but our function set, as we’ll soon see, limits our information gathering to squares ahead of us. If we used the latter set, then we would force the agent to act blindly whenever it opts to move.
+
+Our function set is a lot more difficult to define. We need a minimal set of “sensors” with which the agent can better understand his situation. Typically, this will be changed as test runs fail to perform adequately or programs seem to request a lot of unneccessary information.
+
+For example, an early function set for this experiment was limited to functions which detected the various possible costs of the squares immediately ahead of the agent. The result was a set of algorithms which found paths to the goal quite by accident, because the agents was never able to ask a crucial question: “where is the goal?” Consequently, four functions were added to the set to allow the agent to inquire about his position relative to the endpoint.
+
+As another example, it was determined that the function set did not allow the agent to backtrack. One a move is initiated, the function pointer returns to the top of the tree. Consequently, if the agent doesn’t like the square ahead of him and decides to turn right, he had better hope that one of the next three squares in his rotation is more satisfactory. In other words, after each move, he loses his memory completely. One solution might be to allow the program access to a register where it can store information about previous investigations. Another solution, and the one I used, is to add a new function which has as one branch a terminal, and as the other either a terminal or another function. In keeping with Genetic Programming’s favor for Lisp, many people refer to such a program as progn2 or something similar. I called mine doBoth. The doBoth function executes its iftrue child (a terminal), and then continues branching down the iffalse path.
+
+To visualize the above, let’s say we’d like our function to see if the square ahead is a water space, and if so we’d like to turn right. Without doBoth, it looks like this:
+
+isWaterAhead1
+
+-turnRight
+
+-another function or terminal
+
+Remember that once we decide to make that right turn, we effectively forget that there was water ahead of us previously. We can very easily end up in a situation where we spin indefinitely looking for no water. What we’d like is a way to look for water, turn right and look for water, turn right and look for water, turn right and look for water (whew!) and if we turn right again, move forward, since that’s our only option.
+
+isWaterAhead1
+
+-doBoth
+
+--turnRight
+
+--isWaterAhead1
+
+---another function or terminal
+
+—another function or terminal-another function or terminal
+
+When we turn right in response to doBoth, we do not leave the current tree. In fact, we continue examining the area with the knowledge that one turn prior we encountered water.
+
+Adding a function like doBoth requires extra care when writing your tree parsing code — you must make sure that crossover does not copy a function node to a spot which demands a terminal!
+
+Sensors
+
+The unit can sense the following:
+
+    Water within 3 squares ahead
+    Enemies within 1 square ahead
+    Trees from 5 squares ahead
+    If the forward square is more or less steep than the current square
+    If the goal is ahead, behind, to the right or to the left [added March 09]
+
+Additionally, we have a doBoth function that executes its ifftrue child (a terminal), and then continues down its iffalse path.
+
+In-program, these are all boolean functions, and are represented as follows:
+
+    isWaterAhead1, isWaterAhead2, isWaterAhead3
+    isEnemyAhead
+    isBlockedAhead1, isBlockedAhead2, isBlockedAhead3, isBlockedAhead4, isBlockedAhead5
+    isSteeperAhead, isLessSteepAhead
+    isGoalLeft, isGoalRight, isGoalAhead, isGoalBehind
+    doBoth
+
+These are the functions. I suspect this will need to be modified down the road to provide the programs with a suitable set of sensors.
+
+Note that the isSteeperAhead and isLessSteepAhead essentially compare the cost of the next square relative to the current square (for example, water ahead of level3 slope would return true), and thus should allow a program that closely resembles smart A*. Similarly, the isBlockedAhead1 function allows a program to closely resemble stupid A*.
+
+The isGoal* functions were added March 09 to allow algorithms some sense of direction (this drastically cut down on the aimlessness of the prior algorithms).
+
+One very interesting thing to take special note of here is that we limiting the AI’s information to what is directly ahead of it. If it wants to analyze its surroundings before making a move, it will need to evolve that capability.
+
+Moves
+
+The unit has the following moves:
+
+    Turn right
+    Turn left
+    Move forward
+
+As represented in-program, these are:
+
+    turnRight
+    turnLeft
+    moveForward
+
+These are the terminals.
+
+Solutions
+
+Solutions are stored in a binary tree, with terminals as leaves, and functions as parent nodes. This will allow easy generation of a path.
+
+Given the 40×40 grid, with a clear start and end position, the solution tree need only be traversed according to the values returned by its function nodes until a terminal is reached.
+06-1910399686T.jpg 	07-1741123993T.jpg 	A fairly complex solution displayed in the tree view. This path is complete, and was found by A*. 	The path discovered by the current best solution. Notice it fails by crossing into a green X (tree) square. The program has been expanded to show the traversal of the program tree to get from the start position (0,0) to the first move (1,0). In the tree view, the top child is selected if the parent condition is true, and the bottom child if false. This path terminates in a moveForward terminal.
+
+Fitness
+
+Scoring
+
+In the event a program finds a full path from the start point to the end point, the score is determined by adding the number of forward moves (turns are not counted) to the penalty aquired from each square traversed.
+
+In the event a solution fails to find a complete path, the score is as above, for as long as the path reached, plus the manhattan distance from the terminal point of the path to the end point on the map, plus a FAILURE penalty of 20000. In this way, a full collection of failing algorithms will still be comparable according, mostly, to the manhattan distance to the goal. For example, if the path dies immediately upon leaving (0,0), its final score would be 20,000 + (39 + 39) = 20,078. This would be a better score than a solution which stumbled around before dying at (0,0), as such a solution would aquire some penalties and moves before dying in the same place (in other words, at least the first solution had the decency to die efficiently). It is not immediately clear if this is the correct way to score failed programs, but I am going with it for the time being. An alternative would be to disregard penalties until the solution finds a complete path.
+
+Natural Selection
+
+Repopulation
+
+The application contains functions for copying a tree (or subtree) to another location, deleting trees (or subtrees), generating random trees (or subtrees) of fixed depth, finding a random node in a tree and determining the depth of a tree.
+
+Combining these functions allows:
+
+    Mutation
+
+    find random node
+    determine depth of this node
+    delete node
+    generate random tree of this depth (2) at the mutation location (1)
+
+    Crossover
+
+    select Parent A
+    select Parent B
+    find random node in (1)
+    find random node in (2)
+    get a pointer to (3)
+    copy (4) to (3)
+    delete (4)
+    copy (5) to (4)
+    delete (5)
+
+    Reproduction
+
+Given the above, two parent programs (A, B) can create two child programs (C, D) as follows:
+
+    copy A to C
+    copy B to D
+    get a random node in C
+    get a random node in D
+    swap (3) and (4)
+
+Because of the potentially large size of solution trees in memory, population size will be important. I will be experimenting with different size populations on a system with 1GB memory running a 3.4GHz Pentium 4 processor.
+
+Steady-State Repopulation
+
+The application allows for steady-state repopulation and non-steady state repopulation.
+
+In steady-state repopulation, the two offspring of the two best members of the population replace the two worst members of the population. The reproduced member (if any), retains its place.
+
+In non-steady-state repopulation, once the best and/or crossed-over members are put back in the population, the population is regenerated with new random solutions.
+
+Results
+
+Test Runs
+
+March 08
+
+A few (non-genetic) test runs seemed to indicate that the best solution was likely to converge to a solution which minimizes to the following:
+
+    if isBlockedAhead1 then turnLeft
+    else moveForward
+
+The resulting path is shown in the following image:
+
+08-1507172181T.jpg
+
+This has been the outcome of 20 consecutive random runs (where the run ends when a solution is found, with each round testing a new random solution). [note: all members of the population were random. No genetic selection occurred at all.]
+
+This seemed to indicate that functions like isGoalWest, isGoalEast, isGoalSouth and isGoalNorth would be necessary to allow the program a way to think smarter than a wall-avoiding robot. These have not been added yet, but likely will be by the end of the night.
+
+Upon running this with genetic selection, the result was as expected, but with a fairly surpising twist: the algorithm was not only reducable to the single node program listed above, it actually was that program. In other words, while the best algorithm was ultimately stupid, it was at least simplified. There is nothing in the program to encourage it to favor minimized programs over bloated ones, but it seemed to work out that way anyways.
+
+March 09
+
+The functions isGoalNorth (et al) actually ended up being very stupid functions, due to the fact that the unit in motion has direction (so while it can ask about the NSEW-ness of the goal, it can’t make useful decisions based on that information).
+
+Consequently, the four new functions added are instead isGoalForward, isGoalBehind, isGoalLeft and isGoalRight. These return information which takes into account the direction, and thus allows the program to make much more useful decisions.
+
+So far, I am getting some useful paths, running with a population of 200, mutation probability of 8%, reproduction probability of 70%, and crossover probability of 95%. The solutions are relatively smart, and score surprisingly close to smart A*. On my Middle Earth map, in fact, consisting of a river, a mountain, and some trees, A* scores 93 while the evolved program scores 88. On this particular map, I was able to evolve a program which beat A* (although clearly a good algorithm would need to work on any map, not just a fixed map).
+09-1659319789T.jpg 	09-1656276231T.jpg
+The evolved program scores an 88. The best possible score for this map is 83 (thanks to Scott Lenser for pointing out my previous error). 	Smart A* scores an 93 on the same map.
+
+March 10
+
+Crucial to finding a good generalized algorithm is making sure the algorithm succeeds and succeeds well on any map, even and especially because the map might change during the course of pathfinding (enemies move, for example).
+10-1644447179T.jpg
+Running on a randomly generated map which cycles every 100 rounds. Best solution in red, second best in blue, all others in black.
+
+March 11
+
+Below you can see the profound effects of adding a single function, doBoth, to the function set. The function executes its left child (which is always a terminal), and continues down the right path. This effectively gives the program memory by allowing it to make turns without resetting the function pointer to the top of the tree. After the terminal child of a doBoth function node is executed, the function pointer continues down the other path. Therefore, every decision made during this turn takes into account what was deduced before the move.
+
+This sort of memory is built into the program itself, and requires no additional constructs (such as memory registers or program variables). An additional bonus is that it allows the program to request as much or as little memory as required — the only drawback is a potentially much larger program tree.
+
+50 generations turned up the following algorithm, which was impossible under the old function set:
+11-2212309134T.jpg 	11-2218555219T.jpg
+Algorithm is able to analyze its surroundings before making a decision. 	Same algorithm on a different map. Notice it makes more turns and behaves much smarter. This one seems to like hugging the left wall.
+
+March 12
+
+The function set is now complete to my satisfaction, and a flag has been added to allow the application to run in steady-state or non-steady-state.
+
+I’ve chosen the following values for this run:
+Reproduce Probability: 	100% 	Crossover Probability: 	95%
+Mutation Probability: 	4% 	Population Size: 	50
+Cycle Map: 	Off 	Map Cycle: 	N/A
+Steady State: 	Off 	Max Moves: 	1000
+
+We are running on a single map with no rotation, to see if we can evolve an algorithm which finds its way through a hallway while avoiding penalty squares.
+12-1128471729T.jpg 	12-1130249557T.jpg 	12-1149217897T.jpg
+Initially, the program knows only “plow ahead”.
+[30 generations] 	Soon, the program develops the ability to find openings in walls, and leans towards the goal. But it is still ignorant of the penalty squares (marked in grey).
+[50 generations] 	Finally, the program develops some ability to avoid penalty squares (although by no means perfect).
+[2200 generations]
+
+Many thousands of generations failed to avoid all penalty squares, although it cannot be said that hundreds of thousands would not perform better. Still, it is pretty remarkable to find even this left-avoiding scheme after only a coupld thousand rounds.
+
+March 13
+12-2358005809T.jpg
+Intelligent navigation through a mountain pass.
+[approx 1000 generations]
+
+March 14
+
+A new program to navigate the maze map emerges:
+14-1955081852T.jpg 	14-1959452022T.jpg
+The strategy here is right-leaning, as opposed to the earlier left-leaning program. Besides being different from the previous maze strategy (and, more importantly, better scoring), it is more specific to the map it adapted to.
+[approx 500 generations] 	Unfortunately, that specificity makes it an utter failure on any other map.
+
+Code
+
+The GP Pathfinding application should be considered BETA software. Hampton is a proof-of-concept and is meant to be a starting point for related projects. There is a good chance of the application crashing if you try to alter the settings while the simulation is running. Stop the evolution loop before making changes!
+
+Hampton is released under the Gnu Public License (GPL). You can contribute to this project. More information coming soon.
+
+You can also download the latest version of the Visual Studio project (with full source) or just the executable (most recent build).
+
+About the Author
+
+Rick Strom is owner and lead programmer at Glowdot Productions, which in turn owns glowfoto.com, an image hosting and social networking site. Rick holds a B.S. in Mathematics from the University of California at Santa Barbara, and is currently pursuing a M.S. in Computer Science from the California State University in Los Angeles. Strom is currently developing an action-puzzle game for the Windows platform.
+
+You can contact Rick through his personal website at rick-strom.com

@@ -1,5 +1,6 @@
 # Creates the examples.
 
+add_subdirectory(gp_pathfinder)
 add_subdirectory(sr)
 
 file(GLOB FOREX_SRC CONFIGURE_DEPENDS "forex/*.cc")
