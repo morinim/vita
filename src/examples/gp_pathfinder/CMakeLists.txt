@@ -7,9 +7,10 @@ if (${SDL2_FOUND})
 
   file(GLOB_RECURSE GP_PATHFINDER_SRC CONFIGURE_DEPENDS "*.cc")
 
-  add_executable(gp_pathfinder ${GP_PATHFINDER_SRC})
+  find_package (Threads)
 
-  target_link_libraries(gp_pathfinder vita imgui ${SDL2_LIBRARIES})
+  add_executable(gp_pathfinder ${GP_PATHFINDER_SRC})
+  target_link_libraries(gp_pathfinder vita imgui ${SDL2_LIBRARIES} Threads::Threads)
 
   # Resources needed by examples
   file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/map.txt

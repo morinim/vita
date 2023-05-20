@@ -11,8 +11,13 @@
  *  \see https://github.com/morinim/vita/wiki/pathfinding_tutorial
  */
 
+#include <chrono>
+#include <condition_variable>
 #include <filesystem>
+#include <future>
 #include <iostream>
+#include <optional>
+#include <queue>
 #include <vector>
 
 #include "third_party/imgui/imgui.h"
@@ -21,6 +26,60 @@
 #include <SDL2/SDL.h>
 
 #include "kernel/vita.h"
+
+/*********************************************************************
+ *  Thread safe queue
+ *********************************************************************/
+template <class T>
+class ts_queue
+{
+public:
+  void push(T item)
+  {
+    std::unique_lock<std::mutex> lock(mutex_);
+    queue_.push(item);
+    cond_.notify_one();
+  }
+
+  T pop()
+  {
+    std::unique_lock<std::mutex> lock(mutex_);
+
+    // Wait until queue is not empty.
+    cond_.wait(lock, [this]() { return !queue_.empty(); });
+
+    // Retrieve item.
+    const T item(queue_.front());
+    queue_.pop();
+
+    return item;
+  }
+
+  bool empty()
+  {
+    std::unique_lock<std::mutex> lock(mutex_);
+    return queue_.empty();
+  }
+
+  std::optional<T> try_pop()
+  {
+    using namespace std::chrono_literals;
+    std::unique_lock<std::mutex> lock(mutex_);
+
+    if (queue_.empty())
+      return {};
+
+    // Retrieve item.
+    const T item(queue_.front());
+    queue_.pop();
+    return item;
+  }
+
+private:
+  std::queue<T> queue_ {};           // underlying queue
+  std::mutex    mutex_ {};           // for thread synchronization
+  std::condition_variable cond_ {};  // for signaling
+};  // ts_queue
 
 // Algorithms like A* are well known solutions to the pathfinding problem, but
 // there is a distinction between *efficient and accurate* pathfinding
@@ -88,21 +147,21 @@ enum terrain : char {enemy = 'V', unpassable = 'X', water = '~',
                      moderate_slope ='3', strong_slope = '4',
                      extreme_slope = '5', steep_slope = '6'};
 
-SDL_Color t_color(terrain t)
+ImColor t_color(terrain t)
 {
   switch (t)
   {
-  case enemy:          return {255, 0, 0, 0};
-  case water:          return {0, 0, 255, 0};
-  case flat:           return {86, 125, 70, 0};
-  case nearly_flat:    return {255, 255, 153, 0};
-  case gentle_slope:   return {255, 255, 102, 0};
-  case moderate_slope: return {255, 255, 51, 0};
-  case strong_slope:   return {181, 101, 29, 0};
-  case extreme_slope:  return {101, 67, 33, 0};
-  case steep_slope:    return {43, 29, 20, 0};
+  case enemy:          return {255, 0, 0};
+  case water:          return {0, 0, 255};
+  case flat:           return {86, 125, 70};
+  case nearly_flat:    return {255, 255, 153};
+  case gentle_slope:   return {255, 255, 102};
+  case moderate_slope: return {255, 255, 51};
+  case strong_slope:   return {181, 101, 29};
+  case extreme_slope:  return {101, 67, 33};
+  case steep_slope:    return {43, 29, 20};
   default:
-    return {0, 0, 0, 0};
+    return {0, 0, 0};
   }
 }
 
@@ -216,10 +275,20 @@ public:
     pos(p);
   }
 
-  void turn_right() { dir_ = d_turn_right(dir_); }
-  void turn_left() { dir_ = d_turn_left(dir_); }
+  void turn_right()
+  {
+    dir_ = d_turn_right(dir_);
+    trajectory_.emplace_back(pos(), dir());
+  }
 
-  const std::vector<std::pair<position, direction>> &trajectory() const
+  void turn_left()
+  {
+    dir_ = d_turn_left(dir_);
+    trajectory_.emplace_back(pos(), dir());
+  }
+
+  using trajectory_t = std::vector<std::pair<position, direction>>;
+  const trajectory_t &trajectory() const
   {
     return trajectory_;
   }
@@ -228,7 +297,7 @@ private:
   position p_ {};
   direction dir_ {direction::east};
 
-  std::vector<std::pair<position, direction>> trajectory_ {};
+  trajectory_t trajectory_ {};
 };
 
 /*********************************************************************
@@ -284,8 +353,6 @@ private:
   position goal_;
 };
 
-simulation *active_sim = nullptr;
-
 /*********************************************************************
  *  Action
  *********************************************************************/
@@ -299,17 +366,21 @@ simulation *active_sim = nullptr;
 class action : public vita::terminal
 {
 protected:
-  explicit action(const std::string &n) : vita::terminal(n) {}
+  explicit action(const std::string &n, simulation &s) : vita::terminal(n),
+                                                         sim_(&s)
+  {}
+
+  simulation *sim_;
 };
 
 class move_forward : public action
 {
 public:
-  move_forward() : action("move_forward") {}
+  explicit move_forward(simulation &s) : action("move_forward", s) {}
 
   vita::value_t eval(vita::symbol_params &) const final
   {
-    active_sim->move_forward();
+    sim_->move_forward();
     return {};
   }
 };
@@ -317,11 +388,11 @@ public:
 class turn_right : public action
 {
 public:
-  turn_right() : action("turn_right") {}
+  explicit turn_right(simulation &s) : action("turn_right", s) {}
 
   vita::value_t eval(vita::symbol_params &) const final
   {
-    active_sim->turn_right();
+    sim_->turn_right();
     return {};
   }
 };
@@ -329,11 +400,11 @@ public:
 class turn_left : public action
 {
 public:
-  turn_left() : action("turn_left") {}
+  explicit turn_left(simulation &s) : action("turn_left", s) {}
 
   vita::value_t eval(vita::symbol_params &) const final
   {
-    active_sim->turn_left();
+    sim_->turn_left();
     return {};
   }
 };
@@ -341,7 +412,7 @@ public:
 class do_both : public vita::function
 {
 public:
-  explicit do_both() : vita::function("do_both", 2) {}
+  do_both() : vita::function("do_both", 2) {}
 
   vita::value_t eval(vita::symbol_params &p) const final
   {
@@ -365,14 +436,19 @@ public:
 class sensor : public vita::function
 {
 protected:
-  explicit sensor(const std::string &n) : vita::function(n, 0, {0, 0}) {}
+  sensor(const std::string &n, simulation &s) : vita::function(n, 0, {0, 0}),
+                                                sim_(&s)
+  {}
+
+  simulation *sim_ {nullptr};
 };
 
 class is_something_happening : public sensor
 {
 protected:
-  is_something_happening(const std::string &m, std::function<bool()> c)
-    : sensor(m), check_(std::move(c))
+  is_something_happening(const std::string &m, simulation &s,
+                         std::function<bool()> c)
+    : sensor(m, s), check_(std::move(c))
   {
   }
 
@@ -395,12 +471,12 @@ template<terrain T, int D> class is_something_ahead
   : public is_something_happening
 {
 protected:
-  explicit is_something_ahead(const std::string &m)
+  is_something_ahead(const std::string &m, simulation &s)
     : is_something_happening(
-        m,
-        []
+        m, s,
+        [this]
         {
-          return active_sim->terrain_at(active_sim->ahead(D)) == T;
+          return sim_->terrain_at(sim_->ahead(D)) == T;
         })
   {
   }
@@ -411,21 +487,37 @@ template<int D> class is_water_ahead
   : public is_something_ahead<terrain::water, D>
 {
 protected:
-  is_water_ahead() : is_water_ahead::is_something_ahead("is_water_ahead"
-                                                        + std::to_string(D))
+  explicit is_water_ahead(simulation &s)
+    : is_water_ahead::is_something_ahead("is_water_ahead" + std::to_string(D),
+                                         s)
   {
   }
 };
 
-class is_water_ahead1 : public is_water_ahead<1> {};
-class is_water_ahead2 : public is_water_ahead<2> {};
-class is_water_ahead3 : public is_water_ahead<3> {};
+class is_water_ahead1 : public is_water_ahead<1>
+{
+public:
+  explicit is_water_ahead1(simulation &s) : is_water_ahead(s) {}
+};
+
+class is_water_ahead2 : public is_water_ahead<2>
+{
+public:
+  explicit is_water_ahead2(simulation &s) : is_water_ahead(s) {}
+};
+
+class is_water_ahead3 : public is_water_ahead<3>
+{
+public:
+  explicit is_water_ahead3(simulation &s) : is_water_ahead(s) {}
+};
 
 // Detects enemy units one square ahead.
 class is_enemy_ahead : public is_something_ahead<terrain::enemy, 1>
 {
 public:
-  is_enemy_ahead() : is_something_ahead<terrain::enemy, 1>("is_enemy_ahead")
+  explicit is_enemy_ahead(simulation &s)
+    : is_something_ahead<terrain::enemy, 1>("is_enemy_ahead", s)
   {
   }
 };
@@ -435,26 +527,41 @@ template<int D> class is_blocked_ahead
   : public is_something_ahead<terrain::unpassable, D>
 {
 protected:
-  is_blocked_ahead() : is_blocked_ahead::is_something_ahead("is_blocked_ahead")
+  explicit is_blocked_ahead(simulation &s)
+    : is_blocked_ahead::is_something_ahead("is_blocked_ahead", s)
   {
   }
 };
 
-class is_blocked_ahead1 : public is_blocked_ahead<1> {};
-class is_blocked_ahead2 : public is_blocked_ahead<2> {};
-class is_blocked_ahead3 : public is_blocked_ahead<3> {};
+class is_blocked_ahead1 : public is_blocked_ahead<1>
+{
+public:
+  explicit is_blocked_ahead1(simulation &s) : is_blocked_ahead(s) {}
+};
+
+class is_blocked_ahead2 : public is_blocked_ahead<2>
+{
+public:
+  explicit is_blocked_ahead2(simulation &s) : is_blocked_ahead(s) {}
+};
+
+class is_blocked_ahead3 : public is_blocked_ahead<3>
+{
+public:
+  explicit is_blocked_ahead3(simulation &s) : is_blocked_ahead(s) {}
+};
 
 // `true` if penalty ahead greater than current penalty.
 class is_steeper_ahead : public is_something_happening
 {
 public:
-  is_steeper_ahead()
+  explicit is_steeper_ahead(simulation &s)
     : is_something_happening(
-        "is_steeper_ahead",
-        []
+        "is_steeper_ahead", s,
+        [this]
         {
-          return t_penalty(active_sim->terrain_at(active_sim->ahead(1)))
-                 > t_penalty(active_sim->terrain_at(active_sim->pos()));
+          return t_penalty(sim_->terrain_at(sim_->ahead(1)))
+                 > t_penalty(sim_->terrain_at(sim_->pos()));
         })
       {
       }
@@ -464,13 +571,13 @@ public:
 class is_less_steep_ahead : public is_something_happening
 {
 public:
-  is_less_steep_ahead()
+  explicit is_less_steep_ahead(simulation &s)
     : is_something_happening(
-        "is_less_steep_ahead",
-        []
+        "is_less_steep_ahead", s,
+        [this]
         {
-          return t_penalty(active_sim->terrain_at(active_sim->ahead(1)))
-                 < t_penalty(active_sim->terrain_at(active_sim->pos()));
+          return t_penalty(sim_->terrain_at(sim_->ahead(1)))
+                 < t_penalty(sim_->terrain_at(sim_->pos()));
         })
       {
       }
@@ -480,14 +587,15 @@ public:
 class is_goal_somewhere : public is_something_happening
 {
 protected:
-  is_goal_somewhere(const std::string &n, std::function<position()> new_pos)
+  is_goal_somewhere(const std::string &n, simulation &s,
+                    std::function<position()> new_pos)
     : is_something_happening(
-        n,
+        n, s,
         [this]
         {
-          const auto current_distance(distance(active_sim->pos(),
-                                               active_sim->goal()));
-          const auto new_distance(distance(new_pos_(), active_sim->goal()));
+          const auto current_distance(distance(sim_->pos(),
+                                               sim_->goal()));
+          const auto new_distance(distance(new_pos_(), sim_->goal()));
 
           return new_distance < current_distance;
         }),
@@ -502,14 +610,12 @@ private:
 class is_goal_left : public is_goal_somewhere
 {
 public:
-  is_goal_left()
+  explicit is_goal_left(simulation &s)
     : is_goal_somewhere(
-        "is_goal_left",
-        []
+        "is_goal_left", s,
+        [this]
         {
-          return active_sim->ahead(active_sim->pos(),
-                                   d_turn_left(active_sim->dir()),
-                                   1);
+          return sim_->ahead(sim_->pos(), d_turn_left(sim_->dir()), 1);
         })
   {
   }
@@ -518,14 +624,12 @@ public:
 class is_goal_right : public is_goal_somewhere
 {
 public:
-  is_goal_right()
+  explicit is_goal_right(simulation &s)
     : is_goal_somewhere(
-        "is_goal_right",
-        []
+        "is_goal_right", s,
+        [this]
         {
-          return active_sim->ahead(active_sim->pos(),
-                                   d_turn_right(active_sim->dir()),
-                                   1);
+          return sim_->ahead(sim_->pos(), d_turn_right(sim_->dir()), 1);
         })
   {
   }
@@ -534,11 +638,11 @@ public:
 class is_goal_ahead : public is_goal_somewhere
 {
 public:
-  is_goal_ahead()
-    : is_goal_somewhere("is_goal_ahead",
-                        []
+  explicit is_goal_ahead(simulation &s)
+    : is_goal_somewhere("is_goal_ahead", s,
+                        [this]
                         {
-                          return active_sim->ahead(1);
+                          return sim_->ahead(1);
                         })
   {
   }
@@ -547,15 +651,193 @@ public:
 class is_goal_behind : public is_goal_somewhere
 {
 public:
-  is_goal_behind()
-    : is_goal_somewhere("is_goal_behind",
-                        []
+  explicit is_goal_behind(simulation &s)
+    : is_goal_somewhere("is_goal_behind", s,
+                        [this]
                         {
-                          return active_sim->ahead(-1);
+                          return sim_->ahead(-1);
                         })
   {
   }
 };
+
+/*********************************************************************
+ *  Vita related code
+ *********************************************************************/
+class simulation_problem : public vita::problem
+{
+public:
+  explicit simulation_problem(const map &m) : sim_(m)
+  {
+    // Sensors.
+    insert<is_water_ahead1>(sim_);
+    insert<is_water_ahead2>(sim_);
+    insert<is_water_ahead3>(sim_);
+    insert<is_enemy_ahead>(sim_);
+    insert<is_blocked_ahead1>(sim_);
+    insert<is_blocked_ahead2>(sim_);
+    insert<is_blocked_ahead3>(sim_);
+    insert<is_steeper_ahead>(sim_);
+    insert<is_less_steep_ahead>(sim_);
+    insert<is_goal_left>(sim_);
+    insert<is_goal_right>(sim_);
+    insert<is_goal_ahead>(sim_);
+    insert<is_goal_behind>(sim_);
+
+    // Terminals
+    insert<move_forward>(sim_);
+    insert<turn_left>(sim_);
+    insert<turn_right>(sim_);
+
+    insert<do_both>();  // ... and the 'special' `do_both`
+  }
+
+  struct execution_result
+  {
+    // A sequence of {trajectory, goal} pairs.
+    std::vector<std::pair<agent::trajectory_t, position>> trace {};
+
+    // The attained fitness considering multiple attempts.
+    vita::fitness_t                                     fitness {};
+  };
+
+  execution_result execute_program(const vita::i_mep &);
+
+  execution_result best() const { return best_; }
+
+private:
+  simulation sim_;
+
+  execution_result best_ {};
+};
+
+simulation_problem::execution_result simulation_problem::execute_program(
+  const vita::i_mep &prg)
+{
+  const simulation backup_sim(sim_);
+
+  static std::vector<std::pair<position, position>> start_goal;
+  if (start_goal.empty())
+    for (unsigned i(0); i < 100; ++i)
+    {
+      position start, goal;
+      do
+      {
+        start = position(vita::random::sup(sim_.map().height()),
+                         vita::random::sup(sim_.map().width()));
+        goal = position(vita::random::sup(sim_.map().height()),
+                        vita::random::sup(sim_.map().width()));
+      } while (start == goal
+               || sim_.terrain_at(start) == unpassable
+               || sim_.terrain_at(goal) == unpassable);
+
+      start_goal.emplace_back(start, goal);
+    }
+
+  execution_result res;
+
+  double total_cost(0.0);
+
+  for (const auto &[start, goal] : start_goal)
+  {
+    sim_.pos(start);
+    sim_.goal(goal);
+
+    unsigned max_cycles(1000), same_state(0);
+    for (unsigned j(0);
+         j < max_cycles && sim_.pos() != goal && same_state < 4;
+         ++j)
+    {
+      vita::run(prg);
+
+      for (const auto &[p, d] : sim_.agent().trajectory())
+        if (p == sim_.pos() && d == sim_.dir())
+          ++same_state;
+    }
+
+    if (sim_.pos() == goal)
+    {
+      for (const auto &[p, d] : sim_.agent().trajectory())
+        total_cost -= t_penalty(sim_.terrain_at(p));
+    }
+    else
+    {
+      const auto distance_to_goal(distance(sim_.pos(), goal));
+      total_cost -= static_cast<double>(10000 + distance_to_goal);
+    }
+
+    res.trace.push_back({sim_.agent().trajectory(), goal});
+
+    sim_ = backup_sim;
+  }
+
+  res.fitness = {total_cost};
+
+  if (res.fitness > best().fitness)
+    best_ = res;
+
+  return res;
+}
+
+class path_evaluator : public vita::evaluator<vita::i_mep>
+{
+public:
+  explicit path_evaluator(simulation_problem &sp) : sp_(&sp) {}
+
+  [[nodiscard]] vita::fitness_t operator()(const vita::i_mep &x) override
+  {
+    return sp_->execute_program(x).fitness;
+  }
+
+private:
+  simulation_problem *sp_;
+};
+
+struct info
+{
+  simulation_problem::execution_result er {};
+  std::string best_program {};
+};
+
+ts_queue<info> s_queue;
+
+// It's important to note that we are not evolving the path (which would be a
+// GA problem) from start to finish, but the algorithm which finds the path. In
+// other words, the evolved solution is the program which solves the problem.
+// Consequently, a good solution should find an efficient path regardless of
+// the map it is run on.
+//
+// The agent is unaware of the map as a whole, so the "best path" is the
+// shortest given the knowledge available.
+//
+vita::summary<vita::i_mep> search()
+{
+  simulation_problem prob(map("map.txt"));
+
+  vita::search<vita::i_mep, vita::alps_es> s(prob);
+  s.training_evaluator<path_evaluator>(prob);
+
+  vita::i_mep best_so_far;
+  s.after_generation([&](const auto &, const auto &stat)
+                     {
+                       if (stat.best.solution != best_so_far)
+                       {
+                         best_so_far = stat.best.solution;
+
+                         info i;
+                         i.er = prob.best();
+
+                         std::ostringstream out;
+                         out << vita::out::c_language << stat.best.solution;
+                         i.best_program = out.str();
+
+                         s_queue.push(i);
+                       }
+                     });
+
+  prob.env.generations = 10000;
+  return s.run();
+}
 
 /*********************************************************************
  *  Graphics
@@ -569,40 +851,40 @@ public:
                        SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI));
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
-    SDL_CreateWindowAndRenderer(width, height, flags, &win, &renderer);
-    SDL_RenderClear(renderer);
-    SDL_RenderPresent(renderer);
+    SDL_CreateWindowAndRenderer(width, height, flags, &win_, &renderer_);
+    SDL_RenderClear(renderer_);
+    SDL_RenderPresent(renderer_);
   }
 
-  operator SDL_Renderer *() { return renderer; }
-  operator bool() const { return win && renderer; }
+  operator SDL_Renderer *() { return renderer_; }
+  operator bool() const { return win_ && renderer_; }
 
-  SDL_Window *window() { return win; }
+  SDL_Window *window() { return win_; }
 
   int height() const
   {
     int ret;
-    SDL_GetWindowSize(win, nullptr, &ret);
+    SDL_GetWindowSize(win_, nullptr, &ret);
     return ret;
   }
 
   int width() const
   {
     int ret;
-    SDL_GetWindowSize(win, &ret, nullptr);
+    SDL_GetWindowSize(win_, &ret, nullptr);
     return ret;
   }
 
   ~framework()
   {
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(win);
+    SDL_DestroyRenderer(renderer_);
+    SDL_DestroyWindow(window());
     SDL_Quit();
   }
 
 private:
-  SDL_Window *win {nullptr};
-  SDL_Renderer *renderer {nullptr};
+  SDL_Window *win_ {nullptr};
+  SDL_Renderer *renderer_ {nullptr};
 };
 
 class imgui_framework : public framework
@@ -618,30 +900,31 @@ public:
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
-    ImGui_ImplSDL2_InitForSDLRenderer(window(), *this);
-    ImGui_ImplSDLRenderer_Init(*this);
-
     ImGuiIO &io(ImGui::GetIO());
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
     ImGui::StyleColorsDark();
+
+    ImGui_ImplSDL2_InitForSDLRenderer(window(), *this);
+    ImGui_ImplSDLRenderer_Init(*this);
   }
 
   void render()
   {
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
     ImGui::Render();
 
     ImGuiIO &io(ImGui::GetIO());
     SDL_RenderSetScale(*this,
                        io.DisplayFramebufferScale.x,
                        io.DisplayFramebufferScale.y);
+
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     SDL_SetRenderDrawColor(*this,
                            (Uint8)(clear_color.x * 255),
                            (Uint8)(clear_color.y * 255),
                            (Uint8)(clear_color.z * 255),
                            (Uint8)(clear_color.w * 255));
+
     SDL_RenderClear(*this);
     ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
     SDL_RenderPresent(*this);
@@ -655,13 +938,14 @@ public:
   }
 };
 
-void draw_goal(framework &fw, const simulation &s)
-{
-  const int cell_h(fw.height() / s.map().height());
-  const int cell_w(fw.width() / s.map().width());
+std::function<void()> render;
 
-  SDL_Rect r({cell_w * s.goal().x, cell_h * s.goal().y,
-              cell_w, cell_h});
+void draw_goal(framework &fw, const map &m, position goal)
+{
+  const int cell_h(fw.height() / m.height());
+  const int cell_w(fw.width() / m.width());
+
+  SDL_Rect r({cell_w * goal.x, cell_h * goal.y, cell_w, cell_h});
 
   int cidx(0);
   SDL_Color ca[] = {{0, 0, 0, 255}, {255, 255, 0, 255}};
@@ -678,32 +962,28 @@ void draw_goal(framework &fw, const simulation &s)
     r.h -= 2;
     r.w -= 2;
   }
+
+  render();
 }
 
-void draw_trajectory(
-  framework &fw,
-  const simulation &s,
-  const std::vector<std::pair<position, direction>> &trajectory)
+void draw_trajectory(framework &fw, const map &m,
+                     const agent::trajectory_t &trajectory)
 {
-  const int cell_h(fw.height() / s.map().height());
-  const int cell_w(fw.width() / s.map().width());
+  const int cell_h(fw.height() / m.height());
+  const int cell_w(fw.width() / m.width());
 
-  for (unsigned i(1); i < trajectory.size(); ++i)
+  for (const auto &[p, d] : trajectory)
   {
-    const auto &[p0, d0] = trajectory[i - 1];
-    const auto &[p1, d1] = trajectory[i];
-
-    if (p0 == s.goal())
-      break;
-
-    const SDL_Point start_p{cell_w / 2 + cell_w * p0.x,
-                            cell_h / 2 + cell_h * p0.y};
+    const SDL_Point start_p{cell_w / 2 + cell_w * p.x,
+                            cell_h / 2 + cell_h * p.y};
 
     SDL_Point end_p(start_p);
 
-    const int scale(p0 != p1 ? 1 : 2);
+    const auto p1(m.ahead(p, d, 1));
 
-    switch (d0)
+    const int scale(m.is_valid(p1) && m[p1] != unpassable && p1 != p ? 1 : 2);
+
+    switch (d)
     {
     case north:
       end_p.y -= cell_h / scale;
@@ -729,262 +1009,175 @@ void draw_trajectory(
     SDL_Rect r({end_p.x - 1, end_p.y - 1, 3, 3});
     SDL_RenderFillRect(fw, &r);
 
-    SDL_RenderPresent(fw);
-    SDL_Delay(30);
+    SDL_Delay(5);
+    render();
   }
 }
 
-void draw_agent(framework &fw, const simulation &s, position p, direction d)
+void render_frame(const map &m, const info &i, const agent::trajectory_t &trj,
+                  std::size_t up_to, position goal)
 {
-  const int cell_h(fw.height() / s.map().height());
-  const int cell_w(fw.width() / s.map().width());
-  const SDL_Point tl{cell_w * p.x, cell_h * p.y};
-
-  SDL_Point start_p(tl), end_p(tl);
-  switch (d)
-  {
-  case north:
-    start_p.x += cell_w / 2;
-    start_p.y += cell_h;
-    end_p.x += cell_w / 2;
-    if (p == s.goal())
-      end_p.y += cell_h / 2;
-    break;
-
-  case east:
-    start_p.y += cell_h / 2;
-    if (p == s.goal())
-      end_p.x += cell_w / 2;
-    else
-      end_p.x += cell_w;
-    end_p.y += cell_h / 2;
-    break;
-
-  case south:
-    start_p.x += cell_w /2 ;
-    end_p.x += cell_w / 2;
-    if (p == s.goal())
-      end_p.y += cell_h / 2;
-    else
-      end_p.y += cell_h;
-    break;
-
-  case west:
-    start_p.x += cell_w;
-    start_p.y += cell_h / 2;
-    end_p.y += cell_h / 2;
-    if (p == s.goal())
-      end_p.x += cell_w / 2;
-    break;
-  }
-
-  SDL_SetRenderDrawColor(fw, 255, 255, 255, 255);
-  SDL_RenderDrawLine(fw, start_p.x, start_p.y, end_p.x, end_p.y);
-
-  SDL_SetRenderDrawColor(fw, 255, 0, 0, 255);
-  SDL_Rect r({end_p.x - 1, end_p.y - 1, 3, 3});
-  SDL_RenderFillRect(fw, &r);
-
-  SDL_RenderPresent(fw);
-  SDL_Delay(3);
-}
-
-bool render_simulation(const vita::i_mep *prg)
-{
-  const int map_h(active_sim->map().height());
-  const int map_w(active_sim->map().width());
-
-  const int cell_size(15);
-
-  const int h(map_h * cell_size), w(map_w * cell_size);
-
-  static framework fw_map(w, h);
-
-  for (int y(0); y < map_h; ++y)
-    for (int x(0); x < map_w; ++x)
-    {
-      SDL_Rect r({x * cell_size, y * cell_size,
-                  cell_size, cell_size});
-
-      SDL_Color c(t_color(active_sim->terrain_at(position(y, x))));
-
-      SDL_SetRenderDrawColor(fw_map, c.r, c.g, c.b, c.a);
-      SDL_RenderFillRect(fw_map, &r);
-
-      if (active_sim->terrain_at(position(y, x)) == enemy)
-      {
-        r = {r.x + r.w /4, r.y + r.h / 4,
-             r.w / 2, r.h / 2};
-        SDL_SetRenderDrawColor(fw_map, 0, 0, 0, 255);
-        SDL_RenderFillRect(fw_map, &r);
-      }
-    }
-
-  draw_goal(fw_map, *active_sim);
-
-  //for (const auto &[p, d] : active_sim->agent().trajectory())
-  //  draw_agent(fw_map, *active_sim, p, d);
-
-  draw_trajectory(fw_map, *active_sim, active_sim->agent().trajectory());
-
-  SDL_RenderPresent(fw_map);
-
-  static imgui_framework fw_info(w, h);
-
   ImGui_ImplSDLRenderer_NewFrame();
   ImGui_ImplSDL2_NewFrame();
   ImGui::NewFrame();
 
   ImGui::ShowDemoWindow();
 
-  if (prg)
-  {
-    std::ostringstream out;
-    out << vita::out::c_language << *prg;
+  static std::string bp;
+  if (!i.best_program.empty())
+    bp = i.best_program;
 
+  if (!bp.empty())
+  {
     ImGui::Begin("Best program so far");
     ImGui::BeginChild("Scrolling");
-    ImGui::Text("%s", out.str().c_str());
+    ImGui::Text("%s", bp.c_str());
     ImGui::EndChild();
     ImGui::End();
   }
 
-  fw_info.render();
+  ImGui::Begin("Map");
+  ImDrawList *draw_list(ImGui::GetWindowDrawList());
 
-  SDL_Event event;
-  SDL_PollEvent(&event);
-  return event.type != SDL_QUIT;
-}
+  const int map_h(m.height());
+  const int map_w(m.width());
 
-/*********************************************************************
- *  Vita related code
- *********************************************************************/
-vita::fitness_t execute_program(const vita::i_mep &prg, bool render)
-{
-  simulation *const base_sim(active_sim);
+  const auto cur_pos(ImGui::GetCursorScreenPos());
+  const auto win_size(ImGui::GetWindowSize());
 
-  double total_cost(0.0);
+  const float cell_w((win_size.x - cur_pos.x) / map_w);
+  const float cell_h((win_size.y - cur_pos.y) / map_h);
 
-  static std::vector<std::pair<position, position>> start_goal;
-  if (start_goal.empty())
-    for (unsigned i(0); i < 100; ++i)
+  // MAP with enemy
+  for (int y(0); y < map_h; ++y)
+    for (int x(0); x < map_w; ++x)
     {
-      position start, goal;
-      do
+      const auto px(cur_pos.x + x * cell_w), py(cur_pos.y + y * cell_h);
+      draw_list->AddRectFilled(ImVec2(px, py),
+                               ImVec2(px + cell_w, py + cell_h),
+                               t_color(m[position(y, x)]));
+
+      if (m[position(y, x)] == enemy)
       {
-        start = position(vita::random::sup(base_sim->map().height()),
-                         vita::random::sup(base_sim->map().width()));
-        goal = position(vita::random::sup(base_sim->map().height()),
-                        vita::random::sup(base_sim->map().width()));
-      } while (start == goal
-               || base_sim->terrain_at(start) == unpassable
-               || base_sim->terrain_at(goal) == unpassable);
-
-      start_goal.emplace_back(start, goal);
+        draw_list->AddRectFilled(ImVec2(px + cell_w / 4, py + cell_h / 4),
+                                 ImVec2(px + cell_w / 2, py + cell_h / 2),
+                                 t_color(m[position(y, x)]));
+      }
     }
 
-  for (const auto &[start, goal] : start_goal)
+  // GOAL
+  if (goal != position::npos)
   {
-    simulation sim(*base_sim);
-    active_sim = &sim;
+    const ImColor col[] = {{0, 0, 0}, {255, 255, 0}};
 
-    sim.pos(start);
-    sim.goal(goal);
+    unsigned cidx(0);
 
-    unsigned max_cycles(1000), same_state(0);
-    for (unsigned j(0);
-         j < max_cycles && sim.pos() != sim.goal() && same_state < 4;
-         ++j)
+    ImVec2 tl(cur_pos.x + goal.x * cell_w, cur_pos.y + goal.y * cell_h);
+    ImVec2 br(cur_pos.x + goal.x * cell_w + cell_w,
+              cur_pos.y + goal.y * cell_h + cell_h);
+
+    while (br.x > tl.x && br.y > tl.y)
     {
-      vita::run(prg);
+      draw_list->AddRectFilled(tl, br, col[cidx]);
 
-      for (const auto &[p, d] : sim.agent().trajectory())
-        if (p == sim.pos() && d == sim.dir())
-          ++same_state;
+      cidx ^= 1;
+      ++tl.x;
+      ++tl.y;
+      --br.x;
+      --br.y;
     }
-
-    if (sim.pos() == sim.goal())
-    {
-      for (const auto &[p, d] : sim.agent().trajectory())
-        total_cost -= t_penalty(sim.terrain_at(p));
-    }
-    else
-    {
-      const auto distance_to_goal(distance(sim.pos(), sim.goal()));
-      total_cost -= static_cast<double>(10000 + distance_to_goal);
-    }
-
-    if (render)
-      render = render_simulation(&prg);
-
-    active_sim = base_sim;
   }
+/*
+  // TRAJECTORY
+  for (const auto &[p, d] : trj)
+  {
+    if (up_to > 0)
+      --up_to;
+    else
+      break;
 
-  return {total_cost};
+    const ImVec2 start_p(cur_pos.x + cell_w / 2 + cell_w * p.x,
+                         cur_pos.y + cell_h / 2 + cell_h * p.y);
+
+    ImVec2 end_p(start_p);
+
+    const auto p1(m.ahead(p, d, 1));
+
+    const int scale(m.is_valid(p1) && m[p1] != unpassable && p1 != p ? 1 : 2);
+
+    switch (d)
+    {
+    case north:
+      end_p.y -= cell_h / scale;
+      break;
+
+    case east:
+      end_p.x += cell_w / scale;
+      break;
+
+    case south:
+      end_p.y += cell_h / scale;
+      break;
+
+    case west:
+      end_p.x -= cell_w / scale;
+      break;
+    }
+
+    const ImColor white({255, 255, 255});
+    const ImColor red({255, 0, 0});
+    draw_list->AddLine(start_p, end_p, white);
+    draw_list->AddRectFilled(ImVec2(end_p.x - 1, end_p.y - 1),
+                             ImVec2(end_p.x + 1, end_p.y + 1),
+                             red);
+                             }*/
+  ImGui::End();
 }
 
-class evaluator : public vita::evaluator<vita::i_mep>
+void render_sim(imgui_framework &fw, const map &m, const info &i = {})
 {
-public:
-  vita::fitness_t operator()(const vita::i_mep &x) override
+  for (const auto &[trj, goal] : i.er.trace)
   {
-    return execute_program(x, false);
-  }
-};
+    for (std::size_t up_to(0); up_to < trj.size(); ++up_to)
+      render_frame(m, i, trj, up_to, goal);
 
-// It's important to note that we are not evolving the path (which would be a
-// GA problem) from start to finish, but the algorithm which finds the path. In
-// other words, the evolved solution is the program which solves the problem.
-// Consequently, a good solution should find an efficient path regardless of
-// the map it is run on.
-//
-// The agent is unaware of the map as a whole, so the "best path" is the
-// shortest given the knowledge available.
-//
+    fw.render();
+  }
+}
+
 int main()
 {
-  vita::problem prob;
+  using namespace std::chrono_literals;
 
-  prob.insert<is_water_ahead1>();
-  prob.insert<is_water_ahead2>();
-  prob.insert<is_water_ahead3>();
-  prob.insert<is_enemy_ahead>();
-  prob.insert<is_blocked_ahead1>();
-  prob.insert<is_blocked_ahead2>();
-  prob.insert<is_blocked_ahead3>();
-  prob.insert<is_steeper_ahead>();
-  prob.insert<is_less_steep_ahead>();
-  prob.insert<is_goal_left>();
-  prob.insert<is_goal_right>();
-  prob.insert<is_goal_ahead>();
-  prob.insert<is_goal_behind>();
+  auto result(std::async(std::launch::async, search));
 
-  prob.insert<move_forward>();
-  prob.insert<turn_left>();
-  prob.insert<turn_right>();
+  imgui_framework fw_info(600, 600);
 
-  prob.insert<do_both>();
+  while (result.wait_for(0ms) != std::future_status::ready)
+  {
+    SDL_Event event;
+    while (SDL_PollEvent(&event))
+    {
+      ImGui_ImplSDL2_ProcessEvent(&event);
 
-  vita::search<vita::i_mep, vita::alps_es> s(prob);
-  s.training_evaluator<evaluator>();
+      if (event.type == SDL_QUIT)
+        return 0;
+      if (event.type == SDL_WINDOWEVENT
+          && event.window.event == SDL_WINDOWEVENT_CLOSE
+          && event.window.windowID == SDL_GetWindowID(fw_info.window()))
+        return 0;
+    }
 
-  vita::i_mep best_so_far;
-  s.after_generation([&best_so_far](const auto &, const auto &stat)
-                     {
-                       if (stat.best.solution != best_so_far)
-                       {
-                         best_so_far = stat.best.solution;
-                         execute_program(best_so_far, true);
-                       }
-                     });
+    static map m("map.txt");
+    if (const auto i(s_queue.try_pop()); i)
+    {
+      render_sim(fw_info, m, i.value());
 
-  simulation sim(map("map.txt"));
-  active_sim = &sim;
+      //render_program(fw_map, m, i.value());
+    }
+    else
+      render_sim(fw_info, m);
+  }
 
-  prob.env.generations = 10000;
-  const auto result(s.run());
-
-  std::cout << "\nCANDIDATE SOLUTION\n"
-            << vita::out::c_language << result.best.solution
-            << "\n\nFITNESS\n" << result.best.score.fitness << '\n';
+  return 0;
 }
