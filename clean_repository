@@ -1,0 +1,3 @@
+#!/usr/bin/bash
+git gc --auto
+find -name "*~" -print -delete
