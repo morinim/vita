@@ -36,17 +36,19 @@ class ts_queue
 public:
   void push(T item)
   {
-    std::unique_lock<std::mutex> lock(mutex_);
-    queue_.push(item);
+    {
+      std::lock_guard lock(mutex_);
+      queue_.push(item);
+    }
     cond_.notify_one();
   }
 
   T pop()
   {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::unique_lock lock(mutex_);
 
     // Wait until queue is not empty.
-    cond_.wait(lock, [this]() { return !queue_.empty(); });
+    cond_.wait(lock, [this] { return !queue_.empty(); });
 
     // Retrieve item.
     const T item(queue_.front());
@@ -55,16 +57,16 @@ public:
     return item;
   }
 
-  bool empty()
+  bool empty() const
   {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::lock_guard lock(mutex_);
     return queue_.empty();
   }
 
   std::optional<T> try_pop()
   {
     using namespace std::chrono_literals;
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::lock_guard lock(mutex_);
 
     if (queue_.empty())
       return {};
@@ -77,7 +79,7 @@ public:
 
 private:
   std::queue<T> queue_ {};           // underlying queue
-  std::mutex    mutex_ {};           // for thread synchronization
+  mutable std::mutex mutex_ {};      // for thread synchronization
   std::condition_variable cond_ {};  // for signaling
 };  // ts_queue
 
@@ -160,8 +162,7 @@ ImColor t_color(terrain t)
   case strong_slope:   return {181, 101, 29};
   case extreme_slope:  return {101, 67, 33};
   case steep_slope:    return {43, 29, 20};
-  default:
-    return {0, 0, 0};
+  default:             return {0, 0, 0};
   }
 }
 
@@ -178,8 +179,7 @@ int t_penalty(terrain t)
   case strong_slope:   return  4;
   case extreme_slope:  return  5;
   case steep_slope:    return  6;
-  default:
-    return 1000000;
+  default:             return 1000000;
   }
 }
 
@@ -271,8 +271,8 @@ public:
 
   void move_to(position p)
   {
-    trajectory_.emplace_back(pos(), dir());
     pos(p);
+    trajectory_.emplace_back(pos(), dir());
   }
 
   void turn_right()
@@ -315,7 +315,7 @@ public:
     return map_.ahead(p, d, steps);
   }
 
-  position ahead(int steps) const
+  position ahead(int steps = 1) const
   {
     return ahead(pos(), dir(), steps);
   }
@@ -327,7 +327,7 @@ public:
 
   void move_forward()
   {
-    if (const position p1 = ahead(1);
+    if (const position p1 = ahead();
         map_.is_valid(p1) && terrain_at(p1) != unpassable)
       agent_.move_to(p1);
   }
@@ -370,7 +370,7 @@ protected:
                                                          sim_(&s)
   {}
 
-  simulation *sim_;
+  simulation *sim_ {nullptr};
 };
 
 class move_forward : public action
@@ -560,7 +560,7 @@ public:
         "is_steeper_ahead", s,
         [this]
         {
-          return t_penalty(sim_->terrain_at(sim_->ahead(1)))
+          return t_penalty(sim_->terrain_at(sim_->ahead()))
                  > t_penalty(sim_->terrain_at(sim_->pos()));
         })
       {
@@ -576,7 +576,7 @@ public:
         "is_less_steep_ahead", s,
         [this]
         {
-          return t_penalty(sim_->terrain_at(sim_->ahead(1)))
+          return t_penalty(sim_->terrain_at(sim_->ahead()))
                  < t_penalty(sim_->terrain_at(sim_->pos()));
         })
       {
@@ -642,7 +642,7 @@ public:
     : is_goal_somewhere("is_goal_ahead", s,
                         [this]
                         {
-                          return sim_->ahead(1);
+                          return sim_->ahead();
                         })
   {
   }
@@ -684,12 +684,12 @@ public:
     insert<is_goal_ahead>(sim_);
     insert<is_goal_behind>(sim_);
 
-    // Terminals
+    // Terminals.
     insert<move_forward>(sim_);
     insert<turn_left>(sim_);
     insert<turn_right>(sim_);
 
-    insert<do_both>();  // ... and the 'special' `do_both`
+    insert<do_both>();  // ... and the "special" `do_both`
   }
 
   struct execution_result
@@ -743,16 +743,17 @@ simulation_problem::execution_result simulation_problem::execute_program(
     sim_.pos(start);
     sim_.goal(goal);
 
-    unsigned max_cycles(1000), same_state(0);
-    for (unsigned j(0);
-         j < max_cycles && sim_.pos() != goal && same_state < 4;
-         ++j)
+    const unsigned max_cycles(sim_.map().width() * sim_.map().height());
+    for (unsigned j(0); j < max_cycles && sim_.pos() != goal; ++j)
     {
       vita::run(prg);
 
+      unsigned same_state(0);
       for (const auto &[p, d] : sim_.agent().trajectory())
         if (p == sim_.pos() && d == sim_.dir())
           ++same_state;
+      if (same_state >= 4)
+        break;
     }
 
     if (sim_.pos() == goal)
@@ -763,7 +764,7 @@ simulation_problem::execution_result simulation_problem::execute_program(
     else
     {
       const auto distance_to_goal(distance(sim_.pos(), goal));
-      total_cost -= static_cast<double>(10000 + distance_to_goal);
+      total_cost -= static_cast<double>(50000 + distance_to_goal);
     }
 
     res.trace.push_back({sim_.agent().trajectory(), goal});
@@ -797,6 +798,7 @@ struct info
 {
   simulation_problem::execution_result er {};
   std::string best_program {};
+  unsigned generation {};
 };
 
 ts_queue<info> s_queue;
@@ -810,9 +812,9 @@ ts_queue<info> s_queue;
 // The agent is unaware of the map as a whole, so the "best path" is the
 // shortest given the knowledge available.
 //
-vita::summary<vita::i_mep> search()
+vita::summary<vita::i_mep> search(map m)
 {
-  simulation_problem prob(map("map.txt"));
+  simulation_problem prob(m);
 
   vita::search<vita::i_mep, vita::alps_es> s(prob);
   s.training_evaluator<path_evaluator>(prob);
@@ -830,6 +832,8 @@ vita::summary<vita::i_mep> search()
                          std::ostringstream out;
                          out << vita::out::c_language << stat.best.solution;
                          i.best_program = out.str();
+
+                         i.generation = stat.gen;
 
                          s_queue.push(i);
                        }
@@ -938,107 +942,55 @@ public:
   }
 };
 
-std::function<void()> render;
-
-void draw_goal(framework &fw, const map &m, position goal)
+struct running_options_t
 {
-  const int cell_h(fw.height() / m.height());
-  const int cell_w(fw.width() / m.width());
+  map m {};
+  int run_program {-1};
+} running_options;
 
-  SDL_Rect r({cell_w * goal.x, cell_h * goal.y, cell_w, cell_h});
-
-  int cidx(0);
-  SDL_Color ca[] = {{0, 0, 0, 255}, {255, 255, 0, 255}};
-
-  for (int i(0); r.w > 0 && r.h > 0; ++i)
+void render_ui(const std::vector<info> &iv)
+{
+  if (!ImGui::Begin("Data"))
   {
-    SDL_SetRenderDrawColor(fw, ca[cidx].r, ca[cidx].g, ca[cidx].b,
-                           ca[cidx].a);
-    SDL_RenderFillRect(fw, &r);
-
-    cidx = (cidx + 1) % 2;
-    ++r.x;
-    ++r.y;
-    r.h -= 2;
-    r.w -= 2;
+    // Early out if the window is collapsed, as an optimization.
+    ImGui::End();
+    return;
   }
 
-  render();
-}
-
-void draw_trajectory(framework &fw, const map &m,
-                     const agent::trajectory_t &trajectory)
-{
-  const int cell_h(fw.height() / m.height());
-  const int cell_w(fw.width() / m.width());
-
-  for (const auto &[p, d] : trajectory)
+  if (ImGui::CollapsingHeader("Programs"))
   {
-    const SDL_Point start_p{cell_w / 2 + cell_w * p.x,
-                            cell_h / 2 + cell_h * p.y};
-
-    SDL_Point end_p(start_p);
-
-    const auto p1(m.ahead(p, d, 1));
-
-    const int scale(m.is_valid(p1) && m[p1] != unpassable && p1 != p ? 1 : 2);
-
-    switch (d)
+    for (std::size_t i(iv.size()); i-- > 0;)
     {
-    case north:
-      end_p.y -= cell_h / scale;
-      break;
+      if (ImGui::TreeNode(std::to_string(iv[i].generation).c_str()))
+      {
+        ImGui::TextWrapped("%s", iv[i].best_program.c_str());
+        ImGui::TreePop();
+      }
 
-    case east:
-      end_p.x += cell_w / scale;
-      break;
-
-    case south:
-      end_p.y += cell_h / scale;
-      break;
-
-    case west:
-      end_p.x -= cell_w / scale;
-      break;
+      if (running_options.run_program < 0)
+      {
+        ImGui::SameLine();
+        ImGui::SmallButton("Run");
+        if (ImGui::IsItemClicked())
+          running_options.run_program = i;
+      }
     }
 
-    SDL_SetRenderDrawColor(fw, 255, 255, 255, 255);
-    SDL_RenderDrawLine(fw, start_p.x, start_p.y, end_p.x, end_p.y);
-
-    SDL_SetRenderDrawColor(fw, 255, 0, 0, 255);
-    SDL_Rect r({end_p.x - 1, end_p.y - 1, 3, 3});
-    SDL_RenderFillRect(fw, &r);
-
-    SDL_Delay(5);
-    render();
+    ImGui::TreePop();
   }
-}
 
-void render_frame(const map &m, const info &i, const agent::trajectory_t &trj,
-                  std::size_t up_to, position goal)
-{
-  ImGui_ImplSDLRenderer_NewFrame();
-  ImGui_ImplSDL2_NewFrame();
-  ImGui::NewFrame();
+  ImGui::End();
 
   ImGui::ShowDemoWindow();
+}
 
-  static std::string bp;
-  if (!i.best_program.empty())
-    bp = i.best_program;
-
-  if (!bp.empty())
-  {
-    ImGui::Begin("Best program so far");
-    ImGui::BeginChild("Scrolling");
-    ImGui::Text("%s", bp.c_str());
-    ImGui::EndChild();
-    ImGui::End();
-  }
-
+void render_prg(const agent::trajectory_t &trj, std::size_t up_to,
+                position goal)
+{
   ImGui::Begin("Map");
   ImDrawList *draw_list(ImGui::GetWindowDrawList());
 
+  const map &m(running_options.m);
   const int map_h(m.height());
   const int map_w(m.width());
 
@@ -1087,7 +1039,7 @@ void render_frame(const map &m, const info &i, const agent::trajectory_t &trj,
       --br.y;
     }
   }
-/*
+
   // TRAJECTORY
   for (const auto &[p, d] : trj)
   {
@@ -1130,17 +1082,45 @@ void render_frame(const map &m, const info &i, const agent::trajectory_t &trj,
     draw_list->AddRectFilled(ImVec2(end_p.x - 1, end_p.y - 1),
                              ImVec2(end_p.x + 1, end_p.y + 1),
                              red);
-                             }*/
+  }
+}
+
+void render_frame(const std::vector<info> &iv, const agent::trajectory_t &trj,
+                  std::size_t up_to, position goal)
+{
+  SDL_Event event;
+  while (SDL_PollEvent(&event))
+    ImGui_ImplSDL2_ProcessEvent(&event);
+
+  ImGui_ImplSDLRenderer_NewFrame();
+  ImGui_ImplSDL2_NewFrame();
+  ImGui::NewFrame();
+
+  render_ui(iv);
+
+  if (running_options.run_program >= 0)
+    render_prg(trj, up_to, goal);
+
   ImGui::End();
 }
 
-void render_sim(imgui_framework &fw, const map &m, const info &i = {})
+void render(imgui_framework &fw, const std::vector<info> &iv)
 {
-  for (const auto &[trj, goal] : i.er.trace)
+  if (running_options.run_program >= 0)
   {
-    for (std::size_t up_to(0); up_to < trj.size(); ++up_to)
-      render_frame(m, i, trj, up_to, goal);
-
+    for (const auto &[trj, goal] : iv[running_options.run_program].er.trace)
+    {
+      for (std::size_t up_to(0); up_to < trj.size(); ++up_to)
+      {
+        render_frame(iv, trj, up_to, goal);
+        fw.render();
+      }
+    }
+    running_options.run_program = -1;
+  }
+  else
+  {
+    render_frame(iv, {}, 0, position::npos);
     fw.render();
   }
 }
@@ -1149,11 +1129,16 @@ int main()
 {
   using namespace std::chrono_literals;
 
-  auto result(std::async(std::launch::async, search));
+  running_options.m = map("map.txt");
+
+  auto result(std::async(std::launch::async, search, running_options.m));
 
   imgui_framework fw_info(600, 600);
 
-  while (result.wait_for(0ms) != std::future_status::ready)
+  std::vector<info> info_vec;
+
+  while (result.wait_for(0ms) != std::future_status::ready
+         || !s_queue.empty())
   {
     SDL_Event event;
     while (SDL_PollEvent(&event))
@@ -1168,15 +1153,10 @@ int main()
         return 0;
     }
 
-    static map m("map.txt");
     if (const auto i(s_queue.try_pop()); i)
-    {
-      render_sim(fw_info, m, i.value());
+      info_vec.push_back(i.value());;
 
-      //render_program(fw_map, m, i.value());
-    }
-    else
-      render_sim(fw_info, m);
+    render(fw_info, info_vec);
   }
 
   return 0;
