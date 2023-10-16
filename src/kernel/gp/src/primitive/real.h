@@ -493,7 +493,7 @@ public:
     switch (f)
     {
     case cpp_format:
-      return "(abs(%%1%%)<2*std::numeric_limits<T>::epsilon() ?"
+      return "(std::fabs(%%1%%)<2*std::numeric_limits<double>::epsilon() ? "
              "%%2%% : %%3%%)";
     case mql_format:
       return "(NormalizeDouble(%%1%%,8)==0 ? %%2%% : %%3%%)";
@@ -627,8 +627,9 @@ public:
   {
     switch (f)
     {
-    case python_format:  return  "max(%%1%%,%%2%%)";
-    default:             return "fmax(%%1%%,%%2%%)";
+    case cpp_format:     return "std::fmax(%%1%%,%%2%%)";
+    case python_format:  return       "max(%%1%%,%%2%%)";
+    default:             return      "fmax(%%1%%,%%2%%)";
     }
   }
 
