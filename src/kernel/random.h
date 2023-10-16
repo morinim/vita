@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2021 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,7 +15,6 @@
 
 #include <cstdlib>
 #include <random>
-#include <set>
 
 #include "kernel/common.h"
 #include "kernel/range.h"
@@ -36,11 +35,11 @@ using engine_t = vigna::xoshiro256ss;
 
 extern thread_local engine_t engine;
 
-template<class T> T sup(T);
+template<class T> [[nodiscard]] T sup(T);
 
-unsigned ring(unsigned, unsigned, unsigned);
+[[nodiscard]] unsigned ring(unsigned, unsigned, unsigned);
 
-bool boolean(double = 0.5);
+[[nodiscard]] bool boolean(double = 0.5);
 
 void seed(unsigned);
 void randomize();
@@ -78,9 +77,8 @@ T ephemeral(distribution d, T p1, T p2)
 ///
 /// \see
 /// For further details:
-/// - <http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2013/n3551.pdf>
-/// - <http://stackoverflow.com/q/24566574/3235496>
-/// - <http://stackoverflow.com/q/25222167/3235496>
+/// - <https://stackoverflow.com/q/24566574/3235496>
+/// - <https://stackoverflow.com/q/25222167/3235496>
 ///
 template<class T>
 std::enable_if_t<std::is_floating_point_v<T>, T>

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,6 +15,7 @@
 
 #include <cmath>
 #include <iomanip>
+#include <set>
 
 #include "kernel/gp/function.h"
 #include "kernel/gp/gene.h"
