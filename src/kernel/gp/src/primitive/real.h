@@ -41,7 +41,7 @@ static_assert(std::numeric_limits<base_t>::is_iec559,
               "Vita requires IEC 559/IEEE 754 floating-point types");
 
 ///
-/// A simple shortcut for casting an `any` to `base_t`.
+/// A simple shortcut for casting an `value_t` to `base_t`.
 ///
 /// \param[in] v the value that must be casted to base type (`base_t`)
 /// \return      the content of `v`
@@ -494,13 +494,13 @@ public:
     {
     case cpp_format:
       return "(abs(%%1%%)<2*std::numeric_limits<T>::epsilon() ?"
-             "%%3%% : %%4%%)";
+             "%%2%% : %%3%%)";
     case mql_format:
-      return "(NormalizeDouble(%%1%%,8)==0 ? %%3%% : %%4%%)";
+      return "(NormalizeDouble(%%1%%,8)==0 ? %%2%% : %%3%%)";
     case python_format:
-      return "(%%3%% if abs(%%1%%) < 1e-10 else %%4%%)";
+      return "(%%2%% if abs(%%1%%) < 1e-10 else %%3%%)";
     default:
-      return "(fabs(%%1%%)<2*DBL_EPSILON ? %%3%% : %%4%%)";
+      return "(fabs(%%1%%)<2*DBL_EPSILON ? %%2%% : %%3%%)";
     }
   }
 
