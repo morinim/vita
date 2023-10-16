@@ -407,14 +407,14 @@ public:
     switch (f)
     {
     case cpp_format:
-      return "(abs(%%1%%-%%2%%)<2*std::numeric_limits<T>::epsilon() ?"
-             "%%3%% : %%4%%)";
+      return "(std::fabs(%%1%%-%%2%%)<2*std::numeric_limits<double>::epsilon()"
+             "? %%3%% : %%4%%)";
     case mql_format:
       return "(NormalizeDouble(%%1%%-%%2%%,8)==0 ? %%3%% : %%4%%)";
     case python_format:
-      return "(%%3%% if isclose(%%1%%, %%2%%) else %%4%%)";
+      return "(%%3%% if isclose(%%1%%,%%2%%) else %%4%%)";
     default:
-      return "(fabs(%%1%%-%%2%%) < 2*DBL_EPSILON ? %%3%% : %%4%%)";
+      return "(fabs(%%1%%-%%2%%)<2*DBL_EPSILON ? %%3%% : %%4%%)";
     }
   }
 
