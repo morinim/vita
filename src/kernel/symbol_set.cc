@@ -382,7 +382,7 @@ bool symbol_set::collection::is_valid() const
 
   if (ssize < functions.size())
   {
-    vitaERROR << name_ << ": wrong terminal set size (more than symbol set)";
+    vitaERROR << name_ << ": wrong function set size (more than symbol set)";
     return false;
   }
 

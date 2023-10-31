@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -49,8 +49,6 @@ public:
   const symbol &roulette_free(category_t) const;
   const function &roulette_function(category_t) const;
   const terminal &roulette_terminal(category_t) const;
-
-  const symbol &arg(std::size_t) const;
 
   symbol *decode(opcode_t) const;
   symbol *decode(const std::string &) const;
