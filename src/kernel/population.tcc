@@ -57,10 +57,8 @@ void population<T>::init_layer(unsigned l)
 /// \return number of active layers
 ///
 /// \note
-/// * The number of active layers is a dynamic value (almost monotonically
-///   increasing with the generation number).
-/// * Maximum number of layers (`env.alps.layers`) is a constant value
-///   greater than or equal to `layers()`.
+/// The number of active layers is a dynamic value (almost monotonically
+/// increasing with the generation number).
 ///
 template<class T>
 unsigned population<T>::layers() const
@@ -92,7 +90,6 @@ void population<T>::add_layer()
 template<class T>
 void population<T>::remove_layer(unsigned l)
 {
-  Expects(l);
   Expects(l < layers());
 
   pop_.erase(std::next(pop_.begin(), l));
@@ -125,7 +122,6 @@ void population<T>::pop_from_layer(unsigned l)
   Expects(l < layers());
   pop_[l].pop_back();
 }
-
 
 ///
 /// \param[in] c coordinates of an individual
@@ -238,9 +234,8 @@ const problem &population<T>::get_problem() const
 }
 
 ///
-/// \return a `const_iterator` pointing to the first layer of the population
-///
-/// \warning Pointer to the first LAYER *NOT* to the first PROGRAM.
+/// \return a `const_iterator` pointing to the first individual of the
+///         population
 ///
 template<class T>
 typename population<T>::const_iterator population<T>::begin() const

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -166,7 +166,7 @@ bool environment::is_valid(bool force_defined) const
 
     if (!layers)
     {
-      vitaERROR << "Undefined layer data member";
+      vitaERROR << "Undefined layers data member";
       return false;
     }
 

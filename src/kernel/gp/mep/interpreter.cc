@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,7 +20,7 @@ namespace vita
 /// \param[in] ind individual whose value we are interested in
 ///
 /// \warning
-/// The lifetime of `ind` and `ctx` must extend beyond that of the interpreter.
+/// The lifetime of `ind` must extend beyond that of the interpreter.
 ///
 interpreter<i_mep>::interpreter(const i_mep *ind)
   : core_interpreter(), prg_(ind), cache_(ind->size(), ind->categories()),
