@@ -85,7 +85,6 @@ public:
 
   template<bool> friend class basic_iterator;
   friend class individual<i_mep>;
-  friend class interpreter<i_mep>;
 
 private:
   // ---- Private support methods ----

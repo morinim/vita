@@ -125,7 +125,7 @@ between(T min, T sup)
 ///
 /// Uniformly extracts a random value in a range.
 ///
-/// \param[in] r a half-open range range
+/// \param[in] r a half-open range
 /// \return      a random value in range `r`
 ///
 template<class T>

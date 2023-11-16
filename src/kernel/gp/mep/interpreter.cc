@@ -24,7 +24,7 @@ namespace vita
 ///
 interpreter<i_mep>::interpreter(const i_mep *ind)
   : core_interpreter(), prg_(ind), cache_(ind->size(), ind->categories()),
-    ip_(ind->best_)
+    ip_(ind->best())
 {
   Expects(ind);
 }
@@ -49,7 +49,7 @@ value_t interpreter<i_mep>::run_locus(const locus &ip)
 ///
 value_t interpreter<i_mep>::run_nvi()
 {
-  return run_locus(prg_->best_);
+  return run_locus(prg_->best());
 }
 
 ///
@@ -152,7 +152,7 @@ double interpreter<i_mep>::penalty_locus(const locus &ip)
 ///
 double interpreter<i_mep>::penalty_nvi()
 {
-  return penalty_locus(prg_->best_);
+  return penalty_locus(prg_->best());
 }
 
 ///
