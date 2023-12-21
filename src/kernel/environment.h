@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -136,7 +136,7 @@ public:
   /// \note A negative value means means undefined (auto-tune).
   double p_cross = -1.0;
 
-  /// This parameter controls the brood recombination/selection level (`0` to
+  /// This parameter controls the brood recombination/selection level (`1` to
   /// turn it off).
   ///
   /// In nature it's common for organisms to produce many offspring and then

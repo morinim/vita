@@ -92,7 +92,7 @@ fitness_t test_evaluator<T>::operator()(const T &prg)
     return {static_cast<fitness_t::value_type>(0)};
 
   auto it(std::find(buffer_.begin(), buffer_.end(), prg));
-  if (et_ != test_evaluator_type::fixed && it == buffer_.end())
+  if (it == buffer_.end())
   {
     buffer_.push_back(prg);
     it = std::prev(buffer_.end());

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,9 +18,9 @@
 #define      VITA_EVOLUTION_RECOMBINATION_TCC
 
 ///
-/// \param[in] pop   the current population
-/// \param[in] eva   the current evaluator
-/// \param[in] stats pointer to the current set of statistics
+/// \param[in]  pop   the current population
+/// \param[in]  eva   the current evaluator
+/// \param[out] stats pointer to the current set of statistics
 ///
 template<class T>
 strategy<T>::strategy(const population<T> &pop, evaluator<T> &eva,
@@ -62,15 +62,18 @@ typename strategy<T>::offspring_t base<T>::run(
         T ret(crossover(p1, p2));
         ++this->stats_->crossovers;
 
-        // This could be an original contribution of Vita but it's hard to be
-        // sure.
-        // It remembers of the hereditary repulsion constraint (I guess you
-        // could call it signature repulsion) and seems to:
-        // * maintain diversity during the exploration phase;
-        // * optimize the exploitation phase.
-        while (p1.signature() == ret.signature() ||
-               p2.signature() == ret.signature())
-          this->stats_->mutations += ret.mutation(p_mutation, prob);
+        if (p_mutation > 0.0)
+        {
+          // This could be an original contribution of Vita but it's hard to be
+          // sure.
+          // It remembers of the hereditary repulsion constraint (I guess you
+          // could call it signature repulsion) and seems to:
+          // * maintain diversity during the exploration phase;
+          // * optimize the exploitation phase.
+          while (p1.signature() == ret.signature()
+                 || p2.signature() == ret.signature())
+            this->stats_->mutations += ret.mutation(p_mutation, prob);
+        }
 
         return ret;
       });

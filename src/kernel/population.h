@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -74,8 +74,6 @@ public:
   bool save(std::ostream &) const;
 
 private:
-  const environment &get_helper(environment *) const;
-  const problem &get_helper(problem *) const;
 
   const problem *prob_;
 

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2023 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -17,8 +17,9 @@
 #include "kernel/population.h"
 #include "kernel/vitafwd.h"
 
-namespace vita {
-namespace recombination {
+namespace vita::recombination
+{
+
 ///
 /// The operation strategy (crossover, recombination, mutation...) adopted in
 /// the evolution class.
@@ -88,7 +89,7 @@ public:
 };
 
 #include "kernel/evolution_recombination.tcc"
-}  // namespace recombination
-}  // namespace vita
+
+}  // namespace vita::recombination
 
 #endif  // include guard
