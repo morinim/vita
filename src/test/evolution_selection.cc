@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2022 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2024 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -146,7 +146,7 @@ TEST_CASE_FIXTURE(fixture2, "ALPS")
   const auto lc1(alps_select(1.0));
   auto half((lc1[0] + lc1[1]) / 2.0);
   CHECK(lc1[0] >= half * 0.95);
-  CHECK(lc1[0] <= half * 1.05);
+  CHECK(lc1[1] <= half * 1.05);
 
   const auto lc2(alps_select(0.75));
   CHECK(lc2[0] > half);
