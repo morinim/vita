@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2024 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -21,10 +21,10 @@ namespace random
 ///
 /// The shared random engine generator.
 ///
-/// Every thread has its own generator.
 /// The numbers produced will be the same every time the program is run.
+/// Use the `randomize` / `seed` functions for randomization.
 ///
-thread_local engine_t engine;
+engine_t engine;
 
 ///
 /// Initalizes the random number generator.

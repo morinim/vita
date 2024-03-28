@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2023 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2024 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -33,7 +33,7 @@ enum class distribution {uniform, normal};
 ///
 using engine_t = vigna::xoshiro256ss;
 
-extern thread_local engine_t engine;
+extern engine_t engine;
 
 template<class T> [[nodiscard]] T sup(T);
 
