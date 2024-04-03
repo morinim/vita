@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2022 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2024 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -53,7 +53,7 @@ public:
 
   // ---- Aliases ----
   using examples_t = std::vector<example>;
-  using value_type = typename examples_t::value_type;
+  using value_type = examples_t::value_type;
 
   /// Raw input record.
   /// The ETL chain is:
@@ -117,9 +117,9 @@ public:
   dataframe(const std::filesystem::path &, const params &);
 
   // ---- Iterators ----
-  using iterator = typename examples_t::iterator;
-  using const_iterator = typename examples_t::const_iterator;
-  using difference_type = typename examples_t::difference_type;
+  using iterator = examples_t::iterator;
+  using const_iterator = examples_t::const_iterator;
+  using difference_type = examples_t::difference_type;
 
   iterator begin();
   const_iterator begin() const;
