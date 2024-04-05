@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2022 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2024 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,8 +18,8 @@
 #define      VITA_EVOLUTION_REPLACEMENT_TCC
 
 ///
-/// \param[in] pop current population.
-/// \param[in] eva current evaluator.
+/// \param[in] pop current population
+/// \param[in] eva current evaluator
 ///
 template<class T>
 strategy<T>::strategy(population<T> &pop, evaluator<T> &eva) : pop_(pop),
@@ -92,17 +92,18 @@ void family_competition<T>::run(
 }
 
 ///
-/// \param[in] parent coordinates of the candidate parents. Many selection
-///                   algorithms sort the vector in descending fitness (with
-///                   some exceptions, e.g. selection::random).
-///                   Anyway here we assume that the last element contains the
-///                   coordinates of the worst individual of the selection
-///                   phase.
-/// \param[in] offspring vector of the "children".
-/// \param[in,out] s statistical summary.
+/// \param[in]     parent    coordinates of the candidate parents. Many
+///                          selection algorithms sort the vector in descending
+///                          fitness (with some exceptions, e.g.
+///                          `selection::random`).
+///                          Anyway here we assume that the last element
+///                          contains the coordinates of the worst individual
+///                          of the selection phase
+/// \param[in]     offspring vector of the "children"
+/// \param[in,out] s         statistical summary
 ///
 /// Parameters from the environment:
-/// * elitism is `true` => child replaces a member of the population only if
+/// - elitism is `true` => child replaces a member of the population only if
 ///   child is better.
 ///
 template<class T>
@@ -118,13 +119,6 @@ void tournament<T>::run(
 
   // In old versions of Vita, the individual to be replaced was chosen with
   // an ad-hoc kill tournament.
-  // Now we perform just one tournament for choosing the parents; the
-  // individual to be replaced is selected among the worst individuals of
-  // this tournament.
-  // The new way is simpler and more general. Note that when tournament_size
-  // is greater than 2 we perform a traditional selection / replacement
-  // scheme; if it's smaller we perform a family competition replacement
-  // (aka deterministic / probabilistic crowding).
   const auto rep_idx(parent.back());
   const auto f_rep_idx(this->eva_(pop[rep_idx]));
   const bool replace(f_rep_idx < fit_off);

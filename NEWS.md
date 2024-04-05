@@ -3,7 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [3.0.0] - 2024-04-05
+
+Project is now in maintenance mode. Occasional bug fixes and security patches will still be issued.
+
+Development efforts will concentrate on [Ultra](https://github.com/morinim/ultra) which is our new evolutionary algorithms framework with all the wonderful bells and whistles you could only hope for...
+
+So far it's in (pre) alpha state but please take a look at it, I'd love your feedback on it.
 
 ### Added
 - Support for concurrent access to the fitness cache (hash table). The current solution uses a global [(shared) lock](https://en.cppreference.com/w/cpp/thread/shared_lock).

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-#  Copyright (C) 2017-2020 EOS di Manlio Morini.
+#  Copyright (C) 2017-2024 EOS di Manlio Morini.
 #
 #  This Source Code Form is subject to the terms of the Mozilla Public
 #  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -87,7 +87,7 @@ def main():
 
     print("\n\nRELEASE NOTE\n")
     print("1. Build.  cmake -DCMAKE_BUILD_TYPE=Release -B build/ src/ ; cmake --build build/")
-    print("2. Check.  cd build/ ; ./tests")
+    print("2. Check.  cd build/test ; ./tests")
     print('3. Commit. git commit -am "[DOC] Changed revision number to v'
           + version_str(args) + '"')
     print("4. Tag.    git tag -a v" + version_str(args) + " -m \"tag message\"")
