@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2024 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -73,7 +73,7 @@ const category_info &category_set::category(category_t category) const
 
 ///
 /// \param[in] i index of a dataframe column
-/// \return    information about column 'i'
+/// \return      information about column 'i'
 ///
 const category_info &category_set::column(std::size_t i) const
 {

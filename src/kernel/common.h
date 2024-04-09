@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2024 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -22,7 +22,7 @@
 //   codebase;
 // - any other definitions that **really** are needed in every compilation
 //   unit.
-// See also <http://c2.com/cgi/wiki?OneBigHeaderFile>.
+// See also <https://wiki.c2.com/?OneBigHeaderFile>.
 
 #include <cassert>
 #include <cstdint>
@@ -37,9 +37,8 @@ namespace vita
 /// A category provide operations which supplement or supersede those of the
 /// domain but which are restricted to values lying in the (sub)domain by
 /// which is parametrized.
-/// For instance the number 4.0 (in the domain `d_double`) may be present
-/// in two distinct category: 2 (e.g. the category "km/h") and 3 (e.g. the
-/// category "kg").
+/// For instance the constant `4.0` (in the domain `d_double`) may belong to
+/// two distinct categories: `2 =="km/h"` and `3 == "kg"`).
 /// Categories are the way strong typing GP is enforced in Vita.
 using category_t = std::size_t;
 constexpr category_t undefined_category = static_cast<category_t>(-1);

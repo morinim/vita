@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2024 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -67,8 +67,6 @@ bool operator==(const category_info &, const category_info &);
 class category_set
 {
 public:
-  class const_iterator;
-
   explicit category_set(const dataframe::columns_info &, typing = typing::weak);
 
   const category_info &category(category_t) const;
