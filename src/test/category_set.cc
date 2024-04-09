@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2024 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -39,9 +39,8 @@ fixed acidity,volatile acidity,citric acid,residual sugar,chlorides,free sulfur 
     7.5,0.5, 0.36,6.1,0.071,17,102,0.9978,3.35,0.8, 10.5,5)");
 
   dataframe d;
-  dataframe::params p;
 
-  CHECK(d.read_csv(wine, p) == 10);
+  CHECK(d.read_csv(wine) == 10);
   CHECK(d.is_valid());
 
   category_set cs(d.columns);
@@ -105,9 +104,7 @@ fixed acidity,volatile acidity,citric acid,residual sugar,chlorides,free sulfur 
     7.5,0.5, 0.36,6.1,0.071,17,102,0.9978,3.35,0.8, 10.5,5)");
 
   dataframe d;
-  dataframe::params p;
-
-  CHECK(d.read_csv(wine, p) == 10);
+  CHECK(d.read_csv(wine) == 10);
   CHECK(d.is_valid());
 
   category_set cs(d.columns, typing::strong);
