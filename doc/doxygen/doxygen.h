@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2024 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -35,7 +35,6 @@
  *  \page page2 Contributor guidelines
  *  - [Coding style](https://github.com/morinim/vita/wiki/coding_style)
  *  - [Development cycle](https://github.com/morinim/vita/wiki/development_cycle)
- *  - [Contributor Code of Conduct](https://github.com/morinim/vita/blob/master/CODE_OF_CONDUCT.md)
  */
 
 /**
@@ -61,9 +60,6 @@
  *  \example pathfinding02.cc
  *  More complex pathfinding (Genetic Algorithms).
  *
- *  \example rastrigin.cc
- *  More complex pathfinding (Genetic Algorithms).
- *
  *  \example titanic01.cc
  *  "Hello world" classification task (Genetic Programming).
  *  \example titanic02.cc
@@ -73,6 +69,8 @@
  *  \example titanic04.cc
  *  "Hello world" classification task (team-based classification).
  *
+ *  \example rastrigin.cc
+ *  Mathematical optimization (Differential Evolution).
  *  \example scheduling.cc
  *  Scheduling concurrent jobs for several machines (Differential Evolution).
  */

@@ -51,7 +51,7 @@ PROJECT_BRIEF          =
 # and the maximum width should not exceed 200 pixels. Doxygen will copy the logo
 # to the output directory.
 
-PROJECT_LOGO           = ../../img/logoxs.png
+PROJECT_LOGO           = ./logoxs.png
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) path
 # into which the generated documentation will be written. If a relative path is
@@ -736,8 +736,11 @@ WARN_LOGFILE           =
 INPUT                  = ./doxygen.h \
                          ../../src/ \
                          ../../src/kernel/ \
-                         ../../src/kernel/src/ \
-                         ../../src/kernel/src/primitive/
+                         ../../src/kernel/ga/ \
+                         ../../src/kernel/gp/ \
+                         ../../src/kernel/gp/mep \
+                         ../../src/kernel/gp/src \
+                         ../../src/kernel/gp/src/primitive
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -758,7 +761,8 @@ INPUT_ENCODING         = UTF-8
 # *.qsf, *.as and *.js.
 
 FILE_PATTERNS          = *.cc \
-                         *.h
+                         *.h \
+                         *.tcc
 
 # The RECURSIVE tag can be used to specify whether or not subdirectories should
 # be searched for input files as well.
@@ -2014,7 +2018,7 @@ PERL_PATH              = /usr/bin/perl
 # powerful graphs.
 # The default value is: YES.
 
-CLASS_DIAGRAMS         = YES
+CLASS_DIAGRAMS         = NO
 
 # You can define message sequence charts within doxygen comments using the \msc
 # command. Doxygen will then run the mscgen tool (see:
@@ -2038,7 +2042,7 @@ HIDE_UNDOC_RELATIONS   = YES
 # set to NO
 # The default value is: NO.
 
-HAVE_DOT               = YES
+HAVE_DOT               = NO
 
 # The DOT_NUM_THREADS specifies the number of dot invocations doxygen is allowed
 # to run in parallel. When set to 0 doxygen will base this on the number of
