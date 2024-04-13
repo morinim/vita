@@ -7,6 +7,13 @@
 [![License](https://img.shields.io/badge/license-MPLv2-blue.svg)][mpl2]
 [![Twitter](https://img.shields.io/twitter/url/https/github.com/morinim/vita.svg?style=social)][twitter]
 
+## Important notice ##
+
+Project is in maintenance mode. Only bug fixes and security patches will be issued.
+
+All future development efforts have been shifted to [Ultra][Ultra]. Ultra aims to be an [easy replacement](https://github.com/morinim/ultra/wiki/migrating) for Vita, featuring a simpler architecture and full concurrency support.
+
+
 ## Overview ##
 
 Vita is a scalable, high performance framework for genetic programming and genetic algorithms.
@@ -21,8 +28,6 @@ It's suitable for [classification][classification], [symbolic regression][sr], c
 * [more][features]
 
 This software was originally developed by [EOS][eos] without open source in mind. Later (early 2011) the code has been commented, restructured, documented and released as open source.
-
-Although the core development team is still anchored at EOS, Vita is now open source and we would like it to be run by an international team of AI enthusiasts.
 
 ## Symbolic regression example ##
 
@@ -191,5 +196,6 @@ Note that the major version will change rapidly and API changes are fairly commo
 [sr]: https://github.com/morinim/vita/wiki/symbolic_regression
 [tutorials]: https://github.com/morinim/vita/wiki/tutorials
 [twitter]: https://twitter.com/intent/tweet?text=%23Vita+genetic+programming:&url=https%3A%2F%2Fgithub.com%2Fmorinim%2Fvita
+[ultra]: https://github.com/morinim/ultra/
 [wiki]: https://github.com/morinim/vita/wiki
 [windows]: https://github.com/morinim/vita/wiki/win_build
