@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2024 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -47,8 +47,8 @@ struct hash_t
   void combine(hash_t h)
   {
     // This is the simple algorithm used in `Apache.Commons.HashCodeBuilder`.
-    // It uses simple prime number multiplication and is a special key of
-    // Bob Jenkins' idea (`m * H(A) + H(B)`0.
+    // It uses simple prime number multiplication and is a special case of
+    // Bob Jenkins' idea (`m * H(A) + H(B)`).
     data[0] = data[0] * 37 + h.data[0];
     data[1] = data[1] * 37 + h.data[1];
 

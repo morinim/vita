@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2023 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2024 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -161,7 +161,7 @@ bool team<T>::empty() const
 }
 
 ///
-/// \return number of individuals of the team.
+/// \return number of individuals of the team
 ///
 template<class T>
 unsigned team<T>::individuals() const
