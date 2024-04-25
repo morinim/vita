@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2022 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2024 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -86,7 +86,6 @@ private:
   dataframe &validation_data() const;
   src_problem &prob() const;
   template<class E, class... Args> void set_evaluator(Args && ...);
-  bool stop_condition(const summary<T> &) const;
 
   // *** Private data members ***
   // Preferred evaluator for symbolic regression.
