@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2024 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -72,14 +72,14 @@ public:
 
   template<class ...Args> value_t run(Args && ...args) const
   {
-    // Consider that there are situations in which `&int_.program() != &ind_`
-    // and this function will blow up.
+    // There are situations in which `&int_.program() != &ind_` and this
+    // function will blow up.
     // It shouldn't happen: `is_valid` checks for this problematic condition,
     // `operator=` resets the pointer to the reference individual... but it's
     // not enough.
-    // Consider a scenario in which a vector of objects containing
-    // `reg_lambda_f_storage` needs reallocation after a `push_back`. All the
-    // `int_` object are invalidated...
+    // Consider a scenario in which a vector of `reg_lambda_f_storage` objects
+    // needs reallocation after a `push_back`. All the `int_` objects are
+    // invalidated...
     //
     // `src_interpreter` is a lightweight object so we could recreate it here
     // every time or we could add a check:
