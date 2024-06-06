@@ -113,7 +113,6 @@ vita/
     third_party/ ..........Third party libraries
     utility/ ..............Support libraries / files
   tools/ ..................C++ lint checker and other tools
-  CODE_OF_CONDUCT.md.......Standards for how to engage in this community
   CONTRIBUTING.md
   LICENSE
   NEWS.md..................Don't let your friends dump git logs into NEWS
