@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2024 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -30,8 +30,6 @@ namespace vita
 ///   of an individual;
 /// - *test* for a forecast of how well an individual will do in the real
 ///   world.
-/// The `vita::search` class asks the `problem` class to setup the requested
-/// simulation/dataset via the `select` function.
 enum class dataset_t {training = 0, validation, test};
 
 ///

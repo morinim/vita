@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2024 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -605,8 +605,6 @@ bool basic_gaussian_lambda_f<T, S, N>::is_valid() const
 }
 
 ///
-/// Constructs the object reading data from an input stream.
-///
 /// \param[in] ind individual "to be transformed" into a lambda function
 /// \param[in] d   the training set
 ///
@@ -620,6 +618,8 @@ basic_binary_lambda_f<T, S, N>::basic_binary_lambda_f(const T &ind,
   Ensures(is_valid());
 }
 
+///
+/// Constructs the object reading data from an input stream.
 ///
 /// \param[in] in input stream
 /// \param[in] ss active symbol set
@@ -731,14 +731,14 @@ team_class_lambda_f<T, S, N, L, C>::team_class_lambda_f(std::istream &in,
 ///
 /// \param[in] instance data to be classified
 /// \return             the class of `instance` (numerical id) and the
-///                     confidence level (in the `0,1]` interval)
+///                     confidence level (in the `[0,1]` interval)
 ///
 /// * `team_composition::mv` the class which most of the individuals predict
 ///   for a given example is selected as team output.
 /// * `team_composition::wta` the winner is the individual with the highest
 ///   confidence in its decision. Specialization may emerge if different
 ///   members of the team win this contest for different fitness cases (of
-///   curse, it is not a feasible alternative to select the member with the
+///   course, it is not a feasible alternative to select the member with the
 ///   best fitness. Then a decision on unknown data is only possible if the
 ///   right outputs are known in advance and is not made by the team itself).
 ///
@@ -803,7 +803,7 @@ bool team_class_lambda_f<T, S, N, L, C>::save(std::ostream &out) const
 }
 
 ///
-/// \return Class ID used for serialization.
+/// \return class ID used for serialization
 ///
 template<class T, bool S, bool N, template<class, bool, bool> class L,
          team_composition C>
