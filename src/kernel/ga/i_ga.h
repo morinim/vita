@@ -33,19 +33,19 @@ public:
   using iterator       = genome_t::iterator;
   using value_type     = genome_t::value_type;
 
-  const_iterator begin() const;
-  const_iterator end() const;
+  [[nodiscard]] const_iterator begin() const;
+  [[nodiscard]] const_iterator end() const;
 
-  iterator begin();
-  iterator end();
+  [[nodiscard]] iterator begin();
+  [[nodiscard]] iterator end();
 
-  value_type operator[](std::size_t i) const
+  [[nodiscard]] value_type operator[](std::size_t i) const
   {
     Expects(i < parameters());
     return genome_[i];
   }
 
-  value_type &operator[](std::size_t i)
+  [[nodiscard]] value_type &operator[](std::size_t i)
   {
     Expects(i < parameters());
     signature_.clear();
@@ -56,42 +56,42 @@ public:
 
   // Recombination operators.
   unsigned mutation(double, const problem &);
+  friend i_ga crossover(const i_ga &, const i_ga &);
 
   ///
   /// \return `true` if the individual is empty, `false` otherwise
   ///
-  bool empty() const { return size() == 0; }
+  [[nodiscard]] bool empty() const { return size() == 0; }
 
   ///
   /// \return the number of parameters stored in the individual
   ///
   /// \note `parameters()` and `size()` are aliases.
   ///
-  std::size_t size() const { return genome_.size(); }
+  [[nodiscard]] std::size_t size() const { return genome_.size(); }
 
   ///
   /// \return the number of parameters stored in the individual
   ///
   /// \note `size()` and `parameters()` are aliases.
   ///
-  std::size_t parameters() const { return size(); }
+  [[nodiscard]] std::size_t parameters() const { return size(); }
 
-  hash_t signature() const;
+  [[nodiscard]] hash_t signature() const;
 
-  bool operator==(const i_ga &) const;
-  unsigned distance(const i_ga &) const;
+  [[nodiscard]] bool operator==(const i_ga &) const;
+  [[nodiscard]] unsigned distance(const i_ga &) const;
 
   // Visualization/output methods.
   void graphviz(std::ostream &) const;
 
-  bool is_valid() const;
+  [[nodiscard]] bool is_valid() const;
 
   friend class individual<i_ga>;
-  friend i_ga crossover(const i_ga &, const i_ga &);
 
 private:
   // *** Private support methods ***
-  hash_t hash() const;
+  [[nodiscard]] hash_t hash() const;
 
   // Serialization.
   bool load_impl(std::istream &, const symbol_set &);
@@ -105,7 +105,7 @@ private:
 };  // class i_ga
 
 // Recombination operators.
-i_ga crossover(const i_ga &, const i_ga &);
+[[nodiscard]] i_ga crossover(const i_ga &, const i_ga &);
 
 // Visualization/output methods.
 std::ostream &in_line(const i_ga &, std::ostream & = std::cout);
