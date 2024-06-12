@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2024 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -79,8 +79,6 @@ std::ostream &in_line(const i_ga &ga, std::ostream &s)
 /// \param[in] pgm probability of gene mutation
 /// \param[in] prb the current problem
 /// \return        number of mutations performed
-///
-/// \relates i_ga
 ///
 unsigned i_ga::mutation(double pgm, const problem &prb)
 {
@@ -297,21 +295,6 @@ std::ostream &operator<<(std::ostream &s, const i_ga &ind)
 i_ga::operator std::vector<i_ga::value_type>() const
 {
   return genome_;
-}
-
-///
-/// \param[in] lhs first term of comparison
-/// \param[in] rhs second term of comparison
-/// \return        `true` if the two individuals are equal
-///
-/// \note Age is not checked.
-///
-bool operator==(const i_ga &lhs, const i_ga &rhs)
-{
-  const bool eq(std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
-
-  Ensures((lhs.signature() == rhs.signature()) == eq);
-  return eq;
 }
 
 }  // namespace vita
