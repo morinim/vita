@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2024 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -52,8 +52,7 @@ public:
     return genome_[i];
   }
 
-  operator std::vector<value_type>() const;
-  i_ga &operator=(const std::vector<value_type> &);
+  [[nodiscard]] operator std::vector<value_type>() const;
 
   // Recombination operators.
   unsigned mutation(double, const problem &);
@@ -113,7 +112,7 @@ std::ostream &in_line(const i_ga &, std::ostream & = std::cout);
 std::ostream &operator<<(std::ostream &, const i_ga &);
 
 ///
-/// \return a const iterator pointing to the first individual of the team
+/// \return a const iterator pointing to the first gene
 ///
 inline i_ga::const_iterator i_ga::begin() const
 {
@@ -121,7 +120,7 @@ inline i_ga::const_iterator i_ga::begin() const
 }
 
 ///
-/// \return a const iterator pointing to a end-of-team sentry
+/// \return a const iterator pointing to a end-of-genome sentry
 ///
 inline i_ga::const_iterator i_ga::end() const
 {
@@ -129,7 +128,7 @@ inline i_ga::const_iterator i_ga::end() const
 }
 
 ///
-/// \return an iterator pointing to the first individual of the team
+/// \return an iterator pointing to the first gene
 ///
 inline i_ga::iterator i_ga::begin()
 {
@@ -137,7 +136,7 @@ inline i_ga::iterator i_ga::begin()
 }
 
 ///
-/// \return an iterator pointing to a end-of-team sentry
+/// \return an iterator pointing to a end-of-genome sentry
 ///
 inline i_ga::iterator i_ga::end()
 {
