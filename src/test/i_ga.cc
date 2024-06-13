@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2024 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -157,7 +157,7 @@ TEST_CASE_FIXTURE(fixture6, "Serialization")
     std::stringstream ss;
     vita::i_ga i1(prob);
 
-    for (auto j(vita::random::between(0u, 100u)); j; --j)
+    for (auto j(vita::random::sup(100u)); j; --j)
       i1.inc_age();
 
     CHECK(i1.save(ss));

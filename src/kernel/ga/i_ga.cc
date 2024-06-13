@@ -167,7 +167,6 @@ hash_t i_ga::signature() const
 ///
 hash_t i_ga::hash() const
 {
-  // Length in bytes.
   const auto len(genome_.size() * sizeof(genome_[0]));  // length in bytes
   return vita::hash::hash128(genome_.data(), len);
 }
@@ -221,7 +220,7 @@ bool i_ga::is_valid() const
 
     if (!signature_.empty())
     {
-      vitaERROR << "Empty individual must empty signature";
+      vitaERROR << "Empty individual must have empty signature";
       return false;
     }
 
