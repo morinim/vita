@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2017-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2017-2024 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -210,7 +210,7 @@ void rec_put(const shape &base, unsigned piece_id)
 }
 
 ///
-/// Repeatedly fills the board with random a random configuration.
+/// Repeatedly fills the board with a random configuration.
 ///
 void random_put(const shape &base)
 {
