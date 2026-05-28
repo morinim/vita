@@ -8,10 +8,11 @@
 
 ## Important notice ##
 
-Project is in maintenance mode. Only bug fixes and security patches will be issued.
+Vita is now in **maintenance mode**. Only bug fixes and security patches will be issued.
 
-All future development efforts have been shifted to [Ultra][Ultra]. Ultra aims to be an [easy replacement](https://github.com/morinim/ultra/wiki/migrating) for Vita, featuring a simpler architecture and full concurrency support.
+For new development, please use [ULTRA][Ultra] instead. ULTRA is the successor to Vita and has significantly evolved beyond it, with a simpler architecture, full concurrency support, and ongoing active development.
 
+Existing Vita users can migrate to ULTRA with minimal effort; see the [migration guide](https://github.com/morinim/ultra/wiki/migrating).
 
 ## Overview ##
 
